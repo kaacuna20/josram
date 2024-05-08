@@ -1,0 +1,67 @@
+{% extends "clothes/base.html" %}
+{% load static %}
+
+{% block title %}
+JOSRAM
+{% endblock %}
+
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static "clothes/index.css" %}"/>
+{% include "clothes/includes/style.html" %}
+{% endblock %}
+
+{% block content %}
+
+   
+    <div id="carouselExample" class="carousel slide">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <a href=""><img  src="{% static "clothes/images/pag.png" %}" alt="porque-hacer-deporte"></a>
+          </div>
+          <div class="carousel-item">
+            <a href=""><img src="{% static "clothes/images/pag2.png" %}" alt="porque-hacer-deporte"></a>
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+
+<section id="nuevo">
+    <div>
+        <h1> Destacados </h1>
+        <p>Una colección que te acomapañará en todo momento.</p>
+    </div>
+    
+      <div class="row">
+        {% for clothe in clothes %}
+        
+          <div class="col">
+              <div class="card" style="width: 18rem;">
+                <a href="{% url "clothes-details"  clothe.clothes.slug %}">
+                <div class="hover-card">
+                  <img  src="{{ clothe.main_image.url}}" class="card-img-top imagen-1" alt="{{clothe.clothes.name}}">
+                  <img  src="{{ clothe.model_image_1.url}}" class="card-img-top imagen-2" alt="{{clothe.clothes.name}}">
+                </div>
+                  <div class="card-body">
+                    <p class="card-text">{{clothe.clothes.name|title}}.</p>
+                    {% load custom_filters %}
+                    <p class="card-text"> {{ clothe.clothes.price|currency}}</p>
+                  </div>
+                </a>
+                </div>
+          </div>
+          {% endfor %}
+    </div>
+   
+</section>
+
+{% include "clothes/follow.html" %}
+
+{% endblock %}

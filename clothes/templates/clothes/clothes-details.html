@@ -1,0 +1,307 @@
+{% extends "clothes/base.html" %}
+{% load static %}
+
+{% block title %}
+{{clothe_details.name|title}}
+{% endblock %}
+
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static "clothes/clothes-details.css" %}"/>
+<link rel="stylesheet" href="{% static "clothes/comments.css" %}"/>
+<style>
+    
+    .miniaturas {
+        list-style-type: none;  # Quitar viñetas
+        padding: 0;
+        display: flex;  # Mostrar en fila
+    }
+
+    .miniaturas li {
+        margin-right: 10px;  # Espacio entre miniaturas
+        cursor: pointer;  # Cambia el cursor para indicar que es clicable
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section id="details">
+    <div class="row featurette" >
+
+        <div class="col-md-5 order-md-1">
+            <img id="main-image" src="{{ color_clothes.0.main_image.url }}" class="card-img-top" alt="...">
+            
+            {% for photo in color_clothes%}
+            <ul class="miniaturas">
+            <div class="row pt-3" style="display:flex;">
+             
+                        
+                        <div class="col">
+                            <div class="card size-image-small" >
+                                <img src="{{ photo.main_image.url }}" 
+                                class="card-img-top" alt="..." 
+                                onclick="changeImage('{{ photo.main_image.url }}')" 
+                                style="cursor: pointer; ">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card size-image-small" >
+                                <img src="{{ photo.model_image_1.url }}" 
+                                class="card-img-top" alt="..." 
+                                onclick="changeImage('{{ photo.model_image_1.url }}')" 
+                                style="cursor: pointer; ">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card size-image-small" >
+                                <img src="{{ photo.model_image_2.url }}" 
+                                class="card-img-top" alt="..." 
+                                onclick="changeImage('{{ photo.model_image_2.url }}')" 
+                                style="cursor: pointer; ">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card size-image-small" >
+                                <img src="{{ photo.other_image.url }}"
+                                 class="card-img-top" alt="..." 
+                                 onclick="changeImage('{{ photo.other_image.url }}')" 
+                                style="cursor: pointer; ">
+                            </div>
+                        </div>
+                        
+            </div>
+        </ul>
+            {% endfor %}
+        
+        </div>
+
+        <div class="col-md-5 order-md-1" style= "margin-left: 30px;">
+            <div>
+                <span>JOSRAM</span>
+                <h2 >{{clothe_details.name|title}} </h2>
+            </div>
+
+            <div class="py-2 display: flex;">
+                {% load custom_filters %}
+                <h4 class="lead"> {{clothe_details.price|currency}} COP 
+                {% if not size_clothes.in_stock %}
+                <span class="span-stock">Agotado</span></h4>
+                {% endif %}
+            </div>
+
+            <div class="py-2">
+                <form action="{% url "clothes-details" clothe_details.slug %}" method="POST">
+                    {% csrf_token %}
+                       <h4 class="mt-2"> {{ form.size.label_tag }} </h4>
+                      <!-- Mostrar las opciones de tallas -->
+                      <div>
+                        {% for radio in form.size %}
+                            <label class="radio-inline btn btn-color btn-outline-dark rounded-pill px-3" >
+                                {{ radio }} 
+                            </label>
+                        {% endfor %}
+                    </div>
+                    <h4 class="mt-2"> {{ form.color.label_tag }} </h4>
+                    <!-- Mostrar las opciones de colores -->
+                    <div >
+                       
+                        {% for radio in form.color %}
+                            <label class="radio-hidden btn btn-color btn-outline-dark rounded-pill px-3 {% if radio.errors %} errors {% endif %}" >
+                                {{ radio }} 
+                                {{ radio.errors }}
+                            </label>
+                        {% endfor %}
+                    </div>
+            
+                    <h4 class="mt-2">{{ form.cant.label_tag }}</h4>
+                    
+                    <span> {{size_clothes.cant}} en inventario/Carrito - id:{{size_clothes.pk}}</span>
+                    
+                    <div class="py-2">
+                        {{ form.cant }}
+                    </div> 
+
+                    {% if not is_enough %}
+                    <span >
+                        <i class="bi bi-exclamation-circle" ></i>
+                        <svg style="color:red;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+                        </svg>
+                      No puedes agregar más {{clothe_details.name|title}} a la compra. 
+                    </span>
+                    {% else %}
+                    <span >
+                        <i class="bi bi-exclamation-circle" ></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2-circle" viewBox="0 0 16 16">
+                        <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0"/>
+                        <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
+                        </svg>
+                      Hay {{clothe_details.name|title}} disponible!. 
+                    </span>
+                    {% endif %}
+                    <button class="btn btn-primary" type="submit" name="verify">Verificar stock</button>
+                    <!-- Botones para agregar al carrito y proceder a la compra  <form action="{% url "clothes-details" clothe_details.slug %}" method="POST">
+                    {% csrf_token %}-->
+                    </form>
+                
+                {% if not added_cart %}
+                <span >
+                    <i class="bi bi-exclamation-circle" ></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bag-plus-fill" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M10.5 3.5a2.5 2.5 0 0 0-5 0V4h5zm1 0V4H15v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V4h3.5v-.5a3.5 3.5 0 1 1 7 0M8.5 8a.5.5 0 0 0-1 0v1.5H6a.5.5 0 0 0 0 1h1.5V12a.5.5 0 0 0 1 0v-1.5H10a.5.5 0 0 0 0-1H8.5z"/>
+                    </svg>
+                  Se agregó {{clothe_details.name|title}} al carrito. 
+                </span>
+                {% endif %}
+
+                {% if not is_enough or not size_clothes.in_stock%}
+                        <div class="py-2">
+                            <button type="submit" name="proceed_to_checkout" class="btn btn-outline-dark rounded-pill mt-2 disabled" style="width:400px">Sin stock</button>
+                        </div>
+                <div class="py-2">
+                    <button type="submit" name="add_to_cart" class="btn btn-dark rounded-pill disabled" style="width:400px">Agregar al carrito</button>
+                </div>
+
+                {% else %}
+                <form action="{% url "cheackout-buy"  %}" method="POST">
+                    {% csrf_token %}
+                        <div class="py-2">
+                            <input type="hidden" value="{{ form.cant.value }}" name="sizes_clothes_cant">
+                            <input type="hidden" value="{{ size_clothes.pk }}" name="sizes_clothes_pk">
+                            <button type="submit" name="proceed_to_checkout" class="btn btn-outline-dark rounded-pill mt-2 " style="width:400px">Ir a comprar</button>
+                        </div>
+                </form>
+                <form action="{% url "your-cart" %}" method="POST">
+                    {% csrf_token %}
+                <div class="py-2">
+                    <input type="hidden" value="{{ form.cant.value }}" name="sizes_clothes_cant">
+                    <input type="hidden" value="{{ size_clothes.pk }}" name="sizes_clothes_pk">
+                    <button type="submit" name="add_to_cart" class="btn btn-dark rounded-pill" style="width:400px">Agregar al carrito</button>
+                </div>
+                </form>
+                {% endif %}
+
+    
+            <div class="py-2">
+                <p>
+                  {{clothe_details.description }}
+                </p>
+            </div>
+            
+              <a style="color:black;" href="mailto:kaacuna20@gmail.com">
+                <button type="button" class="btn btn-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
+                    <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5m-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3"></path>
+                    </svg>
+                </button> Compartir
+            </a>
+        </div>
+    </div>
+</section>
+
+<section id="details">
+    <div class="accordion" id="accordionExample">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                Dejar una reseña
+            </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <form action="{% url "clothes-details" clothe_details.slug %}" method="POST">
+                            {% csrf_token %}
+                            {% for form_field in comment_form %}
+                            <div class="form-control {% if form_field.errors %} errors {% endif %}" >
+                                {{form_field.label_tag }}
+                                {{ form_field }}
+                                {{ form_field.errors }}
+                            </div>
+                            {% endfor %}
+                            <button type="submit" name="comment" class="btn btn-secondary mt-2 mx-2">Comentar</button>  
+                        </form>
+                    </div>     
+                               
+                    
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="accordion mt-3" id="accordionExample">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Reseñas de Clientes
+                </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                    <div class="my-3 p-3 bg-body rounded shadow-sm">
+                        <h5 class="border-bottom pb-2 mb-2">Reseñas</h5>
+                        {% for comment in comments %}
+                        <div class="pb-3 mb-0 small lh-sm border-bottom w-100 mt-2 mb-0 py-0">
+                            <div class="row">
+                            <div class="col-1 mx-0 py-0" styles="border: 2px solid black; ">
+                                <p style="font-size: 32px; font-weight: 700; margin-bottom:0px; margin-left: 15px;">
+                                    {{ comment.rating}}.0
+                                    <div style=" float: none;
+
+                                margin-left: auto
+                                
+                                margin-right: auto">{{ comment.get_rating_display}}</div>
+                                </p>
+                                
+                            </div>
+                            <div class="col">
+                                <div class="d-flex justify-content-between my-0">
+                                    <strong class="text-gray-dark" style="font-size: 20px;">@{{comment.user_name}}</strong>
+                                    <p>{{ comment.date|date:"d/m/Y"}}</p> 
+                                </div>
+                                <span class="d-block my-0">{{ comment.comment}}</span>
+                            </div>
+                        </div>
+                        </div>
+                        {% endfor %}
+                 
+                        <small class="d-block text-end mt-3">
+                        <a href="#">All updates</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+<script>
+    function changeImage(src) {
+        document.getElementById("main-image").src = src;  # Cambia el src de la imagen grande
+    }
+</script>
+<!-- JavaScript para mantener la selección  
+                -->
+<script>
+    function selectButton(button, groupClass) {
+        // Desseleccionar todos los botones en el grupo
+        var buttons = document.querySelectorAll('.' + groupClass);
+        buttons.forEach(function(btn) {
+            btn.classList.remove('selected');
+        });
+
+        // Seleccionar el botón actual
+        button.classList.add('selected');
+    }
+</script>
+<!-- JavaScript para el desplazamiento del carrusel -->
+
+
+{% include "clothes/follow.html" %}
+{% endblock %}
+

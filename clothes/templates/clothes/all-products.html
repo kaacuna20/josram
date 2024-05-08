@@ -1,0 +1,72 @@
+{% extends "clothes/base.html" %}
+{% load static %}
+
+{% block title %}
+JOSRAM - Todos los Productos
+{% endblock %}
+
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static "clothes/all-products.css" %}"/>
+{% include "clothes/includes/style.html" %}
+{% endblock %}
+
+
+{% block content %}
+
+<section id="header">
+    <div>
+        <h1> Productos </h1>
+    </div>
+
+    {% include "clothes/includes/header-filter.html" %}
+    <div class="album py-5 bg-body-tertiary">
+        <div class="container">
+          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            {% for product in all_products %}
+                <div class="col">
+                    <div  class="card shadow-sm">
+                        <a href="{% url "clothes-details" product.clothes.slug  %}">
+                        <div class="hover-card">
+                            <img  src="{{ product.main_image.url}}" class="card-img-top imagen-1" alt="{{product.clothes.name}}">
+                            <img  src="{{ product.model_image_1.url}}" class="card-img-top imagen-2" alt="{{product.clothes.name}}">
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text"> {{product.clothes.name|title }}</p>
+                       
+                        <div class="d-flex justify-content-between align-items-center">
+                            {% load custom_filters %}
+                            <p class="text-body-secondary"> {{product.clothes.price|currency}} </p>
+                        </div>
+                        </div>
+                    </a>
+                    </div>
+                </div>
+            </a>
+            {%endfor%}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="pagination">
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+          <li class="page-item">
+            <a class="page-link" href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item">
+            <a class="page-link" href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </section>
+
+{% endblock %}

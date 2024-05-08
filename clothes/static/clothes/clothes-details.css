@@ -1,0 +1,40 @@
+#comments {
+    margin: 1rem auto 3rem auto;
+    padding: 2rem;
+    background-color: rgb(14, 13, 13);
+    justify-content: center;
+}
+
+#details {
+    margin: 1rem auto 3rem auto;
+    padding: 2rem;
+    background-color: rgb(240, 228, 228);
+    justify-content: center;
+}
+
+
+#main-image {
+    width:  500px;
+    height: 500px;
+    border: 2px solid black;
+    border-radius: 10px;
+}
+
+.size-image-small {
+    width:  100%;
+    height: 100%;
+    border-radius: 8px;
+}
+
+.size-image-small:hover,
+.size-image-small:active {
+  transform: scale(1.1);
+  
+}
+
+.span-stock {
+    border: 1px solid transparent; 
+    color: black; 
+    border-color:rgb(0 0 0 / 23%);     
+    padding: .5rem 1.3rem .6rem;
+}

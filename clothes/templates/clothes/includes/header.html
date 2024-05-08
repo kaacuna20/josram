@@ -1,0 +1,65 @@
+{% load static %}
+<div class="container d-flex flex-wrap justify-content-center pt-3" >
+    
+    <form class="d-flex" role="search">
+        <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
+        <button class="btn btn-light" type="submit">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+            </svg>
+        </button>
+      </form>
+
+    <a href="{% url "start-page" %}" class="d-flex align-items-center mb-3 mb-lg-0 me-lg-auto link-body-emphasis text-decoration-none" id="logo">
+        <img src="{% static "clothes/images/logo1.jpg" %}" alt="JOSRAM-LOGO" width="140" height="37.69807280513919" sizes="(max-width: 280px) 50vw, 140px">
+    </a>
+
+    <a href="{% url "your-cart" %}" class="d-flex align-items-center mb-3 mb-lg-0 me-lg-auto link-body-emphasis text-decoration-none" id="cart">
+      <button type="button" class="btn btn-dark position-relative">
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="30" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+          <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+        </svg>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          {{number}}
+          <span class="visually-hidden">unread messages</span>
+        </span>
+      </button>
+    </a>
+
+    <div class="container">
+      <header class="d-flex justify-content-center py-3">
+        <ul class="nav nav-pills">
+          <li class="nav-item"><a href="{% url "start-page" %}" class="nav-link">JOSRAM</a></li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Hombres
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="{% url "gender-clothes" "M" %}">Ver todo</a></li>
+                  <li><a class="dropdown-item" href="#">Pantalonetas</a></li>
+                  <li><a class="dropdown-item" href="#">Camisetas</a></li>
+                  <li><a class="dropdown-item" href="#">Hoodies</a></li>
+                  <li><a class="dropdown-item" href="#">Buzos</a></li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Mujeres
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="{% url "gender-clothes" "F" %}">Ver todo</a></li>
+                  <li><a class="dropdown-item" href="#">Crop Top</a></li>
+                  <li><a class="dropdown-item" href="#">Top Deportivos</a></li>
+                  <li><a class="dropdown-item" href="#">Sets</a></li>
+                  <li><a class="dropdown-item" href="#">Leggings</a></li>
+                  <li><a class="dropdown-item" href="#">Enterizos</a></li>
+                  <li><a class="dropdown-item" href="#">Shorts</a></li>
+                </ul>
+              </li>
+          <li class="nav-item"><a href="#" class="nav-link">Blog</a></li>
+          <li class="nav-item"><a href="{% url "all-products" %}" class="nav-link">Todos los productos</a></li>
+          
+        </ul>
+      </header>
+    </div>
+</div>
