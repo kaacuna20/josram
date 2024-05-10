@@ -21,7 +21,7 @@ class SizeClothesClothesFilter(SimpleListFilter):
 class ClothesAdmin(admin.ModelAdmin):
     list_filter = ("type", "gender", )
     list_display = ("name", "type", "gender",)
-    prepopulated_fields = {"slug": ("name",)}
+    prepopulated_fields = {"slug": ("name",), "slug_type":("type",)}
 
 class CommentAdmin(admin.ModelAdmin):
     list_display = ("user_name", "clothes", "date", "rating",)

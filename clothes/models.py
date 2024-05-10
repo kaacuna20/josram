@@ -5,28 +5,30 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 class Clothes(models.Model):
      GENDER_CHOICES = (
-        ('M', 'Male'),
-        ('F', 'Female'),
+        ('hombres', 'Male'),
+        ('mujeres', 'Female'),
      )
      TYPE_CHOICES = (
-        (0, 'crop top'),
-        (1, 'top deportivos'),
-        (2, 'sets'),
-        (3, 'leggings'),
-        (4, 'enterizos'),
-        (5, 'shorts'),
-        (6, 'pantalonetas'),
-        (7, 'camisetas'),
-        (8, 'hoodies'),
-        (9, 'buzo'),
+        ("crop top", 'crop top'),
+        ('top deportivos', 'top deportivos'),
+        ('sets', 'sets'),
+        ('leggings', 'leggings'),
+        ('enterizos', 'enterizos'),
+        ('shorts', 'shorts'),
+        ('pantalonetas', 'pantalonetas'),
+        ('camisetas', 'camisetas'),
+        ('hoodies', 'hoodies'),
+        ('buzo', 'buzo'),
      )
      name = models.CharField(max_length=100, default="clothes")
-     type = models.IntegerField(default=0, choices=TYPE_CHOICES)
-     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+     type = models.CharField(max_length=30, choices=TYPE_CHOICES)
+     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
      price = models.IntegerField()
      description = models.TextField(max_length=400, blank=True)
      slug = models.SlugField(default="", blank=True, null=False, db_index=True)
+     slug_type = models.SlugField(default="", blank=True, null=False, db_index=True)
      date = models.DateField(auto_now=True)
+     avg_rating = models.FloatField(null=True, blank=True)
      
      def __str__(self):
         return f"{self.name}"

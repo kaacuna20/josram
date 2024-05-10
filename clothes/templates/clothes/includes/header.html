@@ -31,15 +31,15 @@
         <ul class="nav nav-pills">
           <li class="nav-item"><a href="{% url "start-page" %}" class="nav-link">JOSRAM</a></li>
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a class="nav-link dropdown-toggle"  role="button" data-bs-toggle="dropdown" aria-expanded="fa">
                   Hombres
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="{% url "gender-clothes" "M" %}">Ver todo</a></li>
-                  <li><a class="dropdown-item" href="#">Pantalonetas</a></li>
-                  <li><a class="dropdown-item" href="#">Camisetas</a></li>
-                  <li><a class="dropdown-item" href="#">Hoodies</a></li>
-                  <li><a class="dropdown-item" href="#">Buzos</a></li>
+                  <li><a class="dropdown-item" href="{% url "gender-clothes" 'hombres' %}">Ver todo</a></li>
+                  <li><a class="dropdown-item" href="{% url "type-clothes" "pantalonetas" %}">Pantalonetas</a></li>
+                  <li><a class="dropdown-item" href="{% url "type-clothes" 'camisetas' %}">Camisetas</a></li>
+                  <li><a class="dropdown-item" href="{% url "type-clothes" 'hoodies' %}">Hoodies</a></li>
+                  <li><a class="dropdown-item" href="{% url "type-clothes" 'buzos' %}">Buzos</a></li>
                 </ul>
               </li>
               <li class="nav-item dropdown">
@@ -47,19 +47,17 @@
                   Mujeres
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="{% url "gender-clothes" "F" %}">Ver todo</a></li>
-                  <li><a class="dropdown-item" href="#">Crop Top</a></li>
-                  <li><a class="dropdown-item" href="#">Top Deportivos</a></li>
-                  <li><a class="dropdown-item" href="#">Sets</a></li>
-                  <li><a class="dropdown-item" href="#">Leggings</a></li>
-                  <li><a class="dropdown-item" href="#">Enterizos</a></li>
-                  <li><a class="dropdown-item" href="#">Shorts</a></li>
+                  <li><a class="dropdown-item" href="{% url "gender-clothes" 'mujeres' %}">Ver todo</a></li>
+                  <li><a class="dropdown-item" href="{% url "type-clothes" 'crop-top' %}">Crop Top</a></li>
+                  <li><a class="dropdown-item" href="{% url "type-clothes" 'top-deportivos' %}">Top Deportivos</a></li>
+                  <li><a class="dropdown-item" href="{% url "type-clothes" 'sets' %}">Sets</a></li>
+                  <li><a class="dropdown-item" href="{% url "type-clothes" 'leggings' %}">Leggings</a></li>
+                  <li><a class="dropdown-item" href="{% url "type-clothes" 'enterizos' %}">Enterizos</a></li>
+                  <li><a class="dropdown-item" href="{% url "type-clothes" 'shorts' %}">Shorts</a></li>
                 </ul>
               </li>
           <li class="nav-item"><a href="#" class="nav-link">Blog</a></li>
           <li class="nav-item"><a href="{% url "all-products" %}" class="nav-link">Todos los productos</a></li>
-          
-        </ul>
       </header>
     </div>
 </div>

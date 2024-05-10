@@ -5,21 +5,29 @@
     <div class="pt-2">
         <p>Filtrar: </p>
     </div>
-
+   
     <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
         
         <ul class="nav nav-pills">
               <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Talla
+                    Colores
                   </a>
                   <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">S (3)</a></li>
-                    <li><a class="dropdown-item" href="#">M (2)</a></li>
-                    <li><a class="dropdown-item" href="#">L (2)</a></li>
-                   
+                    {% for color in colors %}
+                      {% for key, value in color.items %}
+                      <form action="{% url "all-products" %}" method="POST">
+                        {% csrf_token %}
+                      <li>
+                        <label>
+                          <input type="submit" value="{{value}}" name="color_filter" class="dropdown-item">
+                        </label>
+                      </li>
+                      {% endfor %}
+                    {% endfor %}
                   </ul>
                 </li>
+              </form>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     Precio
@@ -28,21 +36,46 @@
                     
                     <price-range class="facets__price">
                         <span class="field-currency">$</span>
-                        <div class="field">
-                          <input class="field__input" name="filter.v.price.gte" id="Mobile-Filter-Precio-GTE" type="number" placeholder="0" min="0" inputmode="decimal" max="350.00000">
-                          <label class="field__label" for="Mobile-Filter-Precio-GTE">Desde</label>
-                        </div>
+                        
+                          <div class="field">
+                            {{ price_form.price_low }}  
+                            <label class="field__label" for="Mobile-Filter-Precio-GTE">Desde</label>
+                          </div>
 
-                        <span class="field-currency">$</span>
-                        <div class="field">
-                          <input class="field__input" name="filter.v.price.lte" id="Mobile-Filter-Precio-LTE" type="number" min="0" inputmode="decimal" placeholder="350.00000" max="350.00000">
-                          <label class="field__label" for="Mobile-Filter-Precio-LTE">hasta</label>
-                        </div>
-                      </price-range>
-                    
-            
+                          <span class="field-currency">$</span>
+                          <div class="field">
+                            {{ price_form.price_hight }}                            
+                            <label class="field__label" for="Mobile-Filter-Precio-LTE">hasta</label>
+                          </div>
+                        </price-range>
+                        <button class="btn btn-primary" type="submit" name="filter_price">Filtrar</button>
+                      
                   </ul>
                 </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    ordenar por:
+                  </a>
+                  <ul class="dropdown-menu">
+                    {% for color in colors %}
+                      {% for key, value in color.items %}
+                      <li>
+                        <label>
+                          <input type="submit" value="{{value}}" name="color_filter" class="dropdown-item">
+                        </label>
+                      </li>
+                      {% endfor %}
+                    {% endfor %}
+                  </ul>
+                </li>
+                <p class="nav-link"  data-bs-toggle="dropdown" aria-expanded="false">
+                  {{clothes_number}} Productos
+                </p>
+                
             </ul>
+            
+           
+              
+            
     </div>
 </div>

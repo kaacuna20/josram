@@ -22,11 +22,15 @@ JOSRAM - {{gender}}
     <div>
         <h1>{{gender}} </h1>
     </div>
-    {% include "clothes/includes/header-filter.html" %}
+    <form action="" method="POST">
+      {% csrf_token %}
+      {% include "clothes/includes/header-filter.html" %}
+      </form>
     
             <div class="album py-5 bg-body-tertiary">
               <div class="container">
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                  {% if clothes %}
                   {% for clothe in clothes %}
                   
                       <div class="col">
@@ -49,6 +53,11 @@ JOSRAM - {{gender}}
                       </div>
                     
                   {%endfor%}
+                  {% else %}
+                  <div>
+                    <h1> No se encontraron elementos a tu búsqueda! </h1>
+                </div>
+                {% endif %}
                   </div>
               </div>
             </div>
