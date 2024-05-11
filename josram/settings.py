@@ -48,7 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #'path.to.JsonMiddleware',
+    'clothes.middleware.ClearSpecificSessionMiddleware',
 ]
 
 ROOT_URLCONF = 'josram.urls'

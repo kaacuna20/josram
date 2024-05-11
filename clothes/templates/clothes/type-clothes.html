@@ -3,7 +3,7 @@
 
 {% block title %}
 
-JOSRAM - {{type}}
+JOSRAM - {{type.title}}
 
 
 {% endblock %}
@@ -20,19 +20,62 @@ JOSRAM - {{type}}
 <section id="header">
   
     <div>
-        <h1>{{type}} </h1>
+        <h1>{{type.title}} </h1>
     </div>
 
-    <form action="" method="POST">
-      {% csrf_token %}
+    
     {% include "clothes/includes/header-filter.html" %}
-    </form>
+   
+    <div class="filters">
+      <ul class="nav nav-pills">
+    {% if nav_colors %}
+          {% for color in nav_colors %}
+          <form action="{% url "type-clothes" type %}" method="POST">
+            {% csrf_token %}
+            <li class="nav-item dropdown">
+              <label class="btn btn-outline-dark rounded-pill px-3"> 
+                <input type="hidden" value="{{ color }}" name="color">
+                  {{color}} 
+                <button type="submit" name="delete_color" class="btn-close" aria-label="Close"></button>
+              </label>
+            </li>
+          </form>
+          {% endfor %}
+       
+      {% endif %}
+    
+      {% if nav_prices %}
+        <form action="{% url "type-clothes" type %}}" method="POST">
+          {% csrf_token %}
+          <li class="nav-item dropdown">
+            <label class="btn btn-outline-dark rounded-pill px-3"> 
+              {% load custom_filters %}
+              <input type="hidden" value="{{ nav_prices}}" name="price">
+                {{nav_prices.0|currency}} - {{nav_prices.1|currency}}
+              <button type="submit" name="delete_price" class="btn-close" aria-label="Close"></button>
+            </label>
+          </li>
+        </form>
+      {% endif %}
+    
+      {% if nav_prices or nav_colors %}
+      <form action="{% url "type-clothes" type %}" method="POST">
+        {% csrf_token %}
+        <li class="nav-item dropdown">
+          <button class="btn btn-secondary rounded-pill px-3" type="submit" name="delete_filters"> 
+            Eliminar todos 
+          </button>
+        </li>
+      </form>
+      {% endif %}
+    </ul>
+    </div>
     
             <div class="album py-5 bg-body-tertiary">
               <div class="container">
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
                   {% if clothes %}
-                  {% for clothe in clothes %}
+                  {% for clothe in page_obj.object_list %}
                   
                       <div class="col">
                           <div  class="card shadow-sm">
@@ -62,27 +105,32 @@ JOSRAM - {{type}}
                   </div>
               </div>
             </div>
-    
 </section>
 
 <section id="pagination">
-    <nav aria-label="Page navigation example">
-        <ul class="pagination">
-          <li class="page-item">
-            <a class="page-link" href="#" aria-label="Previous">
-              <span aria-hidden="true">&laquo;</span>
-            </a>
-          </li>
-          <li class="page-item"><a class="page-link" href="#">1</a></li>
-          <li class="page-item"><a class="page-link" href="#">2</a></li>
-          <li class="page-item"><a class="page-link" href="#">3</a></li>
-          <li class="page-item">
-            <a class="page-link" href="#" aria-label="Next">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </section>
+  <nav aria-label="Page navigation example">
+    <ul class="pagination">
+      {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page=1" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a></li>
+        {% endif %}
+      
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.number }}">{{ page_obj.number }}</a></li>
+        
+          {% if page_obj.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a></li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+          {% endif %}
+        </li>
+      </ul>
+    </nav>
+</section>
 
 {% endblock %}

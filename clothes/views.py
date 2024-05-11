@@ -9,6 +9,8 @@ from .forms import ClotheForm, CommentForm, PriceForm
 from django.urls import reverse
 from django.http import JsonResponse
 import json
+from django.core.paginator import Paginator
+
 # Create your views here.
 
 
@@ -25,134 +27,296 @@ class StartPageView(ListView):
         return data
     
     def get_context_data(self, **kwargs):
+        len_cart = 0
+        if self.request.session.get("cart_clothes") is not None:
+            len_cart = len(self.request.session.get("cart_clothes"))
+
         context = super().get_context_data(**kwargs)
-        context["number"] = len(self.request.session.get("cart_clothes"))
+        context["number"] = len_cart
         return context
 
 class AllProducts(View):
-
+    
     def get(self, request):
-        all_products = ImageClothes.objects.all()
+
+        filter_session = request.session.get("filters_colors")
+        price_session = request.session.get("filters_price")
+        
+
+        if  (filter_session is None or len(filter_session)==0) and (price_session is None or len(price_session)==0):
+            all_products = ImageClothes.objects.all()
+
+        elif filter_session:
+            queryset_union = ImageClothes.objects.none()
+            for color in filter_session:
+                queryset_color = ImageClothes.objects.filter(color=color)
+                # Join with existing QuerySet
+                queryset_union = queryset_union.union(queryset_color)
+            all_products = queryset_union.all()
+
+        elif price_session:
+            all_products = ImageClothes.objects.filter(clothes__price__range=(price_session[0], price_session[1]))
+
+        else:
+            queryset_union = ImageClothes.objects.none()
+            price_filter = ImageClothes.objects.filter(clothes__price__range=(price_session[0], price_session[1]))
+            for color in filter_session:
+                queryset_color = ImageClothes.objects.filter(color=color)
+                # Join with existing QuerySet
+                queryset_union = queryset_union.union(queryset_color)
+            all_products = queryset_union.intersection(price_filter)
+
+        len_cart = 0
+        if self.request.session.get("cart_clothes") is not None:
+            len_cart = len(self.request.session.get("cart_clothes"))
+
+        paginator = Paginator(all_products, 3)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        
+   
         context = {
             "clothes": all_products,
             "clothes_number": all_products.count(),
-            "number": len(self.request.session.get("cart_clothes")),
+            "number": len_cart,
             "colors": ImageClothes.objects.values("color").distinct,
-            "price_form": PriceForm()
+            "price_form": PriceForm(),
+            "nav_colors": filter_session,
+            "nav_prices": price_session,
+            'page_obj': page_obj
         }
         return render(request, "clothes/all-products.html", context)
     
     def post(self, request):
-        filter_session = request.session.get("filters")
+        filter_session = request.session.get("filters_colors")
+        price_session = request.session.get("filters_price")
 
         if filter_session is None:
             filter_session = []
+
+        if price_session is None:
+            price_session = []
        
 
         if "color_filter" in request.POST:
             color_filter = request.POST["color_filter"]
-            filter_colors = ImageClothes.objects.filter(color=color_filter)
-            filter_session.append(color_filter)
-            #ImageClothes.objects.filter(clothes__price__range=(0, 30000))
             
+            if color_filter not in filter_session:
+                filter_session.append(color_filter)
+                # save it in the session
+                request.session["filters_colors"] = filter_session
 
         if "filter_price" in request.POST:
             min_price = int(request.POST["price_low"])
             max_price =int(request.POST["price_hight"])
-            #filter_price = ImageClothes.objects.filter(clothes__price__range=(min_price, max_price))
+            price_session = (min_price, max_price)
+            request.session["filters_price"] = price_session
+           
+        elif "delete_filters" in request.POST:
+            filter_session.clear()
+            price_session.clear()
+            request.session["filters_colors"] = filter_session
+            request.session["filters_price"] = price_session
 
-        """try:
+        elif "delete_color" in request.POST:
+            filter_session.remove(request.POST["color"])
+            request.session["filters_colors"] = filter_session
+
+        elif "delete_price" in request.POST:
+            price_session.clear()
+            request.session["filters_price"] = price_session
             
-            filter_product = filter_colors.intersection(filter_price)
-        except UnboundLocalError:
-            print("nointercep")
-            try:
-                print("nointercep1")
-                filter_product = filter_price
-            except UnboundLocalError:
-                filter_product = filter_colors"""
-        print(filter_session)
+        return HttpResponseRedirect("/products/all")
+################################################################
+    
+class ClothesByType(View):
+    
+    def get(self, request, slug_type):
+
+        filter_session = request.session.get("filters_colors")
+        price_session = request.session.get("filters_price")
+
+        if  (filter_session is None or len(filter_session)==0) and (price_session is None or len(price_session)==0):
+            type_clothes = ImageClothes.objects.filter(clothes__slug_type=slug_type)
+
+        elif filter_session:
+            queryset_union = ImageClothes.objects.none()
+            for color in filter_session:
+                queryset_color = ImageClothes.objects.filter(clothes__slug_type=slug_type, color=color)
+                # Join with existing QuerySet
+                queryset_union = queryset_union.union(queryset_color)
+            type_clothes = queryset_union.all()
+
+        elif price_session:
+            type_clothes = ImageClothes.objects.filter(clothes__slug_type=slug_type, clothes__price__range=(price_session[0], price_session[1]))
+
+        else:
+            queryset_union = ImageClothes.objects.none()
+            price_filter = ImageClothes.objects.filter(clothes__slug_type=slug_type, clothes__price__range=(price_session[0], price_session[1]))
+            for color in filter_session:
+                queryset_color = ImageClothes.objects.filter(clothes__slug_type=slug_type, color=color)
+                # Join with existing QuerySet
+                queryset_union = queryset_union.union(queryset_color)
+            type_clothes = queryset_union.intersection(price_filter)
+
+        len_cart = 0
+        if self.request.session.get("cart_clothes") is not None:
+            len_cart = len(self.request.session.get("cart_clothes"))
+
+        paginator = Paginator(type_clothes, 3)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+   
         context = {
-            "clothes": filter_colors,
-            "clothes_number": filter_colors.count(),
-            "number": len(self.request.session.get("cart_clothes")),
+            
+            "clothes": type_clothes,
+            "clothes_number": type_clothes.count(),
+            "type": slug_type,
+            "number": len_cart,
             "colors": ImageClothes.objects.values("color").distinct,
-            "price_form": PriceForm(request.POST)
-            }
-
+            "price_form": PriceForm(),
+            "nav_colors": filter_session,
+            "nav_prices": price_session,
+            'page_obj': page_obj
+        }
         return render(request, "clothes/all-products.html", context)
+    
+    def post(self, request, slug_type):
+        filter_session = request.session.get("filters_colors")
+        price_session = request.session.get("filters_price")
 
+        if filter_session is None:
+            filter_session = []
+
+        if price_session is None:
+            price_session = []
+       
+
+        if "color_filter" in request.POST:
+            color_filter = request.POST["color_filter"]
+            
+            if color_filter not in filter_session:
+                filter_session.append(color_filter)
+                # save it in the session
+                request.session["filters_colors"] = filter_session
+
+        if "filter_price" in request.POST:
+            min_price = int(request.POST["price_low"])
+            max_price =int(request.POST["price_hight"])
+            price_session = (min_price, max_price)
+            request.session["filters_price"] = price_session
+           
+        elif "delete_filters" in request.POST:
+            filter_session.clear()
+            price_session.clear()
+            request.session["filters_colors"] = filter_session
+            request.session["filters_price"] = price_session
+
+        elif "delete_color" in request.POST:
+            filter_session.remove(request.POST["color"])
+            request.session["filters_colors"] = filter_session
+
+        elif "delete_price" in request.POST:
+            price_session.clear()
+            request.session["filters_price"] = price_session
+            
+        return HttpResponseRedirect("/collections/" + slug_type)
+
+
+
+class ClothesByGender(View):
+    
+    def get(self, request, gender):
+
+        filter_session = request.session.get("filters_colors")
+        price_session = request.session.get("filters_price")
+
+
+        if  (filter_session is None or len(filter_session)==0) and (price_session is None or len(price_session)==0):
+            gender_clothes = ImageClothes.objects.filter(clothes__gender=gender)
+
+        elif filter_session:
+            queryset_union = ImageClothes.objects.none()
+            for color in filter_session:
+                queryset_color = ImageClothes.objects.filter(clothes__gender=gender, color=color)
+                # Join with existing QuerySet
+                queryset_union = queryset_union.union(queryset_color)
+            gender_clothes = queryset_union.all()
+
+        elif price_session:
+            gender_clothes = ImageClothes.objects.filter(clothes__gender=gender, clothes__price__range=(price_session[0], price_session[1]))
+
+        else:
+            queryset_union = ImageClothes.objects.none()
+            price_filter = ImageClothes.objects.filter(clothes__gender=gender, clothes__price__range=(price_session[0], price_session[1]))
+            for color in filter_session:
+                queryset_color = ImageClothes.objects.filter(clothes__gender=gender, color=color)
+                # Join with existing QuerySet
+                queryset_union = queryset_union.union(queryset_color)
+            gender_clothes = queryset_union.intersection(price_filter)
+        
+        len_cart = 0
+        if self.request.session.get("cart_clothes") is not None:
+            len_cart = len(self.request.session.get("cart_clothes"))
+
+        paginator = Paginator(gender_clothes, 3)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
         
    
-
-def show_clothes_by_type(request, slug_type):
-    type_clothes = ImageClothes.objects.filter(clothes__slug_type=slug_type)
-   
-    dict_type = {
-        'crop-top': 'crop top',
-        'top-deportivos': 'top deportivos',
-        'sets': 'sets',
-        'leggings': 'leggings',
-        'enterizos': 'enterizos',
-        'shorts': 'shorts',
-        'pantalonetas': 'pantalonetas',
-        'camisetas': 'camisetas',
-        'hoodies': 'hoodies',
-        'buzo': 'buzo',
-    }
+        context = {
+            "clothes": gender_clothes,
+            "clothes_number": gender_clothes.count(),
+            "gender": gender,
+            "number": len_cart,
+            "colors": ImageClothes.objects.values("color").distinct,
+            "price_form": PriceForm(),
+            "nav_colors": filter_session,
+            "nav_prices": price_session,
+            'page_obj': page_obj
+        }
+        return render(request, "clothes/gender-clothes.html", context)
     
-    if request.method == "POST":
+    def post(self, request, gender):
+        filter_session = request.session.get("filters_colors")
+        price_session = request.session.get("filters_price")
+
+        if filter_session is None:
+            filter_session = []
+
+        if price_session is None:
+            price_session = []
+       
+
         if "color_filter" in request.POST:
             color_filter = request.POST["color_filter"]
-            filter_product = ImageClothes.objects.filter(color=color_filter, clothes__slug_type=slug_type)
+            print(color_filter)
+            if color_filter not in filter_session:
+                filter_session.append(color_filter)
+                # save it in the session
+                request.session["filters_colors"] = filter_session
 
-            context = {
-            "clothes": filter_product,
-            "clothes_number": filter_product.count(),
-            "number": len(request.session.get("cart_clothes")),
-            "colors": ImageClothes.objects.values("color").distinct
-        }
-        return render(request, "clothes/all-products.html", context)
-    
-    
-    return render(request, "clothes/type-clothes.html", {
-        "clothes": type_clothes,
-        "clothes_number": type_clothes.count(),
-        "type": dict_type[slug_type],
-        "number": len(request.session.get("cart_clothes")),
-        "colors": ImageClothes.objects.values("color").distinct
-    })
+        if "filter_price" in request.POST:
+            min_price = int(request.POST["price_low"])
+            max_price =int(request.POST["price_hight"])
+            price_session = (min_price, max_price)
+            request.session["filters_price"] = price_session
+           
+        elif "delete_filters" in request.POST:
+            filter_session.clear()
+            price_session.clear()
+            request.session["filters_colors"] = filter_session
+            request.session["filters_price"] = price_session
 
+        elif "delete_color" in request.POST:
+            filter_session.remove(request.POST["color"])
+            request.session["filters_colors"] = filter_session
 
-def show_clothes_by_gender(request, gender):
-    gender_clothes = ImageClothes.objects.filter(clothes__gender=gender)
-    
-    if request.method == "POST":
-        if "color_filter" in request.POST:
-            color_filter = request.POST["color_filter"]
-            filter_product = ImageClothes.objects.filter(color=color_filter, clothes__gender=gender)
-
-            context = {
-            "clothes": filter_product,
-            "clothes_number": filter_product.count(),
-            "number": len(request.session.get("cart_clothes")),
-            "colors": ImageClothes.objects.values("color").distinct
-        }
-        return render(request, "clothes/all-products.html", context)
-
-
-    dict_gender = {
-        "hombres": "Hombres",
-        "mujeres": "Mujeres",
-    }
-
-    return render(request, "clothes/gender-clothes.html", {
-        "clothes": gender_clothes,
-        "clothes_number": gender_clothes.count(),
-        "gender": dict_gender[gender],
-        "number": len(request.session.get("cart_clothes")),
-        "colors": ImageClothes.objects.values("color").distinct
-    })
+        elif "delete_price" in request.POST:
+            price_session.clear()
+            request.session["filters_price"] = price_session
+            
+        return HttpResponseRedirect("/collection/" + gender)
 
 
 def clothe_details(request, slug):
@@ -170,6 +334,10 @@ def clothe_details(request, slug):
     default_color = form.fields["color"].initial
     size_clothes = SizeClothes.objects.get(color_clothe__clothes__slug=slug, color_clothe__color=default_color, size=default_size)
     is_enough = True
+
+    len_cart = 0
+    if request.session.get("cart_clothes") is not None:
+        len_cart = len(request.session.get("cart_clothes"))
     
     if int(form.fields["cant"].initial) > size_clothes.cant:
         is_enough = False
@@ -193,7 +361,7 @@ def clothe_details(request, slug):
                     "comment_form": comment_form,
                     "comments": clothe_select.comments.all().order_by("-date"),
                     "size_clothes": sizes_clothes,
-                    "number": len(request.session.get("cart_clothes")),
+                    "number": len_cart,
                     "added_cart": added_cart
                 }
                     
@@ -224,7 +392,7 @@ def clothe_details(request, slug):
             "comment_form": comment_form,
             "comments": clothe_select.comments.all().order_by("-date"),
             "size_clothes": size_clothes,
-            "number": len(request.session.get("cart_clothes")),
+            "number": len_cart,
             "added_cart": added_cart
         }
     return render(request, "clothes/clothes-details.html", context)
@@ -236,7 +404,9 @@ class CartView(View):
     def get(self, request):
         stored_clothes = request.session.get("cart_clothes")
         context = {}
-        print(stored_clothes)
+        len_cart = 0
+        if request.session.get("cart_clothes") is not None:
+            len_cart = len(request.session.get("cart_clothes"))
         
         if  stored_clothes is None or len(stored_clothes)==0:
             context["carts"] = []
@@ -267,15 +437,15 @@ class CartView(View):
             
             context["carts"] = cart
             context["has_clothes"] = True
-            context["number"] = len(request.session.get("cart_clothes"))
+            context["number"] = len_cart
             context["sum_prices"] = sum_prices
            
         return render(request, "clothes/cart.html", context)
 
     def post(self, request):
+
         stored_clothes = request.session.get("cart_clothes")
 
-        
         if stored_clothes is None:
             stored_clothes = []
         
@@ -307,24 +477,6 @@ class CartView(View):
                 
             return HttpResponseRedirect("/clothe/" + slug_clothe.color_clothe.clothes.slug)
 
-        """clothes = SizeClothes.objects.filter(id__in=stored_clothes)
-            
-        cart = []
-        for clothe in clothes:
-            quantity = 1
-            total_price = quantity*clothe.color_clothe.clothes.price
-            cart.append({
-            "size_pk": clothe.pk,
-            "name": clothe.color_clothe.clothes.name,
-            "slug": clothe.color_clothe.clothes.slug,
-            "size": clothe.size,
-            "color": clothe.color_clothe.color,
-            "img": clothe.color_clothe.main_image.url,
-            "price": clothe.color_clothe.clothes.price,
-            "quantity": quantity,
-            "total_price": total_price
-            })"""
-        
         if "sizes_pk" in request.POST:
             print(stored_clothes)
             # delete a clothe in the cart
@@ -336,16 +488,20 @@ class CartView(View):
 
 class CheckOutView(View):
     def get(self, request):
+
         stored_clothes = request.session.get("cart_clothes")
-        print(stored_clothes)
         context = {}
+        len_cart = len(request.session.get("cart_clothes"))
+        
+        len_cart = 0
+        if request.session.get("cart_clothes") is not None:
+            len_cart = len(request.session.get("cart_clothes"))
         
         if  stored_clothes is None or len(stored_clothes)==0:
             context["carts"] = []
             context["has_clothes"] = False
 
         else:
-            
             stored_id = [item["id"] for item in stored_clothes]
             stored_cant = [item["cant"] for item in stored_clothes] 
             clothes = SizeClothes.objects.filter(id__in=stored_id)
@@ -371,12 +527,13 @@ class CheckOutView(View):
             
             context["carts"] = cart
             context["has_clothes"] = True
-            context["number"] = len(request.session.get("cart_clothes"))
+            context["number"] = len_cart
             context["sum_prices"] = sum_prices
            
         return render(request, "clothes/checkout.html", context)
 
     def post(self, request):
+
         stored_clothes = request.session.get("cart_clothes")
 
         if stored_clothes is None:
@@ -422,92 +579,6 @@ class CheckOutView(View):
 
 
 
-def cart(request):
-    stored_clothes = request.session.get("cart_clothes")
-    context = {}
-    print(stored_clothes)
-    if  stored_clothes is None or len(stored_clothes)==0:
-        context["carts"] = []
-        context["has_clothes"] = False
 
-    else:
-            
-        clothes = SizeClothes.objects.filter(id__in=stored_clothes)
-            
-        cart = []
-        for clothe in clothes:
-            quantity = 1
-            total_price = quantity*clothe.color_clothe.clothes.price
-            cart.append({
-            "size_pk": clothe.pk,
-            "name": clothe.color_clothe.clothes.name,
-            "slug":clothe.color_clothe.clothes.slug,
-            "size": clothe.size,
-            "color": clothe.color_clothe.color,
-            "img": clothe.color_clothe.main_image.url,
-            "price": clothe.color_clothe.clothes.price,
-            "quantity": quantity,
-            "total_price": total_price
-            })
-            
-        print(cart)
-        sum_prices = sum([item["total_price"] for item in cart])
-        
-            
-        if request.method == 'POST':
-            print("true")
-            
-            stored_clothes = request.session.get("cart_clothes")
-            if stored_clothes is None:
-                stored_clothes = []
-
-            if "sizes_clothes_pk" in request.POST:
-                print(request.POST["sizes_clothes_pk"])
-                sizes_clothes_id = int(request.POST["sizes_clothes_pk"])  
-                if sizes_clothes_id not in stored_clothes:
-                    stored_clothes.append(sizes_clothes_id)
-                    request.session["cart_clothes"] = stored_clothes
-                
-            elif "sizes_pk" in request.POST:
-                print(request.POST["sizes_pk"])
-                stored_clothes.remove(int(request.POST["sizes_pk"]))
-                request.session["cart_clothes"] = stored_clothes
-
-            elif "plus" in request.POST:
-                #print(json.loads(request.body))
-                data = json.loads(request.body)  # Obtener los datos enviados por AJAX
-                #print(data)
-                size_pk = data.get('size_pk')
-                accion = data.get('accion')
-                for item in cart:
-                        
-                    if item['size_pk'] == size_pk:
-                           
-                        #if item['quantity'] > 0:  
-                        if accion == 'incrementar':
-                            item['quantity'] += 1
-                        elif accion == 'decrementar' and item['quantity'] > 1:
-                            item['quantity'] -= 1
-                        item['total_price'] = item['quantity'] * item['price']  # Actualizar el total
-             
-                
-      
-
-                            # Guardar la lista actualizada en la sesión
-                    request.session["cart_clothes"] = [item['size_pk'] for item in cart]
-                    print(cart)
-                            #return HttpResponseRedirect("/sales-cart")
-                            # Respuesta en formato JSON para JavaScript
-                    #return JsonResponse({'total_price': item['total_price'], 'quantity': item['quantity']})
-            return HttpResponseRedirect("/sales-cart")       
-
-              
-        context["carts"] = cart
-        context["has_clothes"] = True
-        context["number"] = len(stored_clothes)
-        context["sum_prices"] = sum_prices
-           
-    return render(request, "clothes/cart.html", context)
-            
     
     
