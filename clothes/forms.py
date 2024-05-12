@@ -58,8 +58,8 @@ class CommentForm(forms.ModelForm):
         }
 
 class PriceForm(forms.Form):
-    price_low = forms.IntegerField(label="CANTIDAD", min_value=0, initial=0)
-    price_hight = forms.IntegerField(label="CANTIDAD", min_value=0, max_value=200000)
+    price_low = forms.IntegerField( min_value=0, initial=0, max_value=200000)
+    price_hight = forms.IntegerField(min_value=0, max_value=200000)
     """def __init__(self, cant, *args, **kwargs):
         super().__init__(*args, **kwargs)
         cant +=1

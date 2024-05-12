@@ -7,9 +7,8 @@ from django.views.generic import ListView, DetailView
 from .models import Clothes, ImageClothes, SizeClothes, Comment
 from .forms import ClotheForm, CommentForm, PriceForm
 from django.urls import reverse
-from django.http import JsonResponse
-import json
 from django.core.paginator import Paginator
+from django.contrib import messages
 
 # Create your views here.
 
@@ -76,7 +75,6 @@ class AllProducts(View):
         
    
         context = {
-            "clothes": all_products,
             "clothes_number": all_products.count(),
             "number": len_cart,
             "colors": ImageClothes.objects.values("color").distinct,
@@ -135,6 +133,7 @@ class ClothesByType(View):
 
         filter_session = request.session.get("filters_colors")
         price_session = request.session.get("filters_price")
+        print("ture")
 
         if  (filter_session is None or len(filter_session)==0) and (price_session is None or len(price_session)==0):
             type_clothes = ImageClothes.objects.filter(clothes__slug_type=slug_type)
@@ -168,8 +167,6 @@ class ClothesByType(View):
         page_obj = paginator.get_page(page_number)
    
         context = {
-            
-            "clothes": type_clothes,
             "clothes_number": type_clothes.count(),
             "type": slug_type,
             "number": len_cart,
@@ -179,7 +176,7 @@ class ClothesByType(View):
             "nav_prices": price_session,
             'page_obj': page_obj
         }
-        return render(request, "clothes/all-products.html", context)
+        return render(request, "clothes/type-clothes.html", context)
     
     def post(self, request, slug_type):
         filter_session = request.session.get("filters_colors")
@@ -367,11 +364,6 @@ def clothe_details(request, slug):
                     
                 return render(request, "clothes/clothes-details.html", context)
        
-            
-                #return redirect("sales-cart")
-            #return HttpResponseRedirect("/sales-cart")
-             
-        #clothe_select = SizeClothes.objects.get(color_clothe__clothes__slug='esqueleto-vibes', color_clothe__color='purpura', size='S').cant 
         elif "comment" in request.POST:
             comment_form = CommentForm(request.POST)
             clothe_select = Clothes.objects.get(slug=slug)
@@ -382,7 +374,6 @@ def clothe_details(request, slug):
                 return HttpResponseRedirect(reverse("clothes-details", args=[slug]))
             else:
                 print(comment_form.errors)
-            #return redirect("clothes-details", color=color, slug=slug)
         
     context = {
             "color_clothes": color_clothes,
@@ -465,15 +456,19 @@ class CartView(View):
                 stored_clothes.append(clothe_choosed)
                 # save it in the session
                 request.session["cart_clothes"] = stored_clothes
+                name = SizeClothes.objects.get(pk=sizes_clothes_id).color_clothe.clothes.name
 
             # if the 'id' of size clothe is in the session, change the quantity 
             elif sizes_clothes_id in stored_id:
                 slug_clothe = SizeClothes.objects.get(pk=sizes_clothes_id)
+                name = SizeClothes.objects.get(pk=sizes_clothes_id).color_clothe.clothes.name
                 for item in stored_clothes:
                     if item["id"] == sizes_clothes_id:
                         item["cant"] = quantity
                 # save it in the session
                 request.session["cart_clothes"] = stored_clothes
+            # send a pop alerting that the clothe is saved in the cart
+            messages.success(request, f'Se agregó {name} al carrito!')
                 
             return HttpResponseRedirect("/clothe/" + slug_clothe.color_clothe.clothes.slug)
 
@@ -484,6 +479,8 @@ class CartView(View):
             stored_clothes.remove(clothe_to_delete)
             request.session["cart_clothes"] = stored_clothes
             return HttpResponseRedirect("/sales-cart")
+        
+       
         
 
 class CheckOutView(View):

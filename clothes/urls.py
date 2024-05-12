@@ -7,7 +7,6 @@ urlpatterns = [
     path("collection/<gender>", views.ClothesByGender.as_view(), name="gender-clothes"),
     path("collections/<slug:slug_type>", views.ClothesByType.as_view(), name="type-clothes"),
     path("clothe/<slug:slug>", views.clothe_details, name="clothes-details"),
-    #path("sales-cart", views.cart, name="your-cart"),
     path("sales-cart", views.CartView.as_view(), name="your-cart"),
     path("checkout", views.CheckOutView.as_view(), name="cheackout-buy")
 ]

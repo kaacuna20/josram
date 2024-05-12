@@ -70,10 +70,10 @@ JOSRAM - {{gender.title}}
       </ul>
       </div>
     
-            <div class="album py-5 bg-body-tertiary">
-              <div class="container">
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-                  {% if clothes %}
+      <div class="album py-0 bg-body-tertiary">
+        <div class="container">
+          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                  {% if page_obj %}
                   {% for clothe in page_obj.object_list %}
                   
                       <div class="col">
@@ -104,7 +104,6 @@ JOSRAM - {{gender.title}}
                   </div>
               </div>
             </div>
-    
 </section>
 
 <section id="pagination">

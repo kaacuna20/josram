@@ -1,3 +1,12 @@
+h1,
+h2,
+h3 {
+    font-family: "Poetsen One", sans-serif;
+  font-weight: bold;
+}
+
+
+
 #comments {
     margin: 1rem auto 3rem auto;
     padding: 2rem;
