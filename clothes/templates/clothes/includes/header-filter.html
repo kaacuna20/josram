@@ -10,158 +10,117 @@
     margin: 0 auto;
     text-align: center
 }
+
+
 </style>
 {% endblock %}
 
-<div class="filters">
-  <ul class="nav nav-pills">
-
-    <li class="nav-item dropdown">
-    
-    
-    <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
-      <p class="nav-link">
-        <i class="bi bi-filter-square"></i>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-filter-square" viewBox="0 0 16 16">
-          <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
-          <path d="M6 11.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"/>
-        </svg>
-        Filtrar:
-      </p>
-        <ul class="nav nav-pills">
-              <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Colores
-                  </a>
-                  <ul class="dropdown-menu">
-                    {% for color in colors %}
-                      {% for key, value in color.items %}
-                      <form action="" method="POST">
-                        {% csrf_token %}
-                      <li>
-                        <label>
-                          <input type="submit" value="{{value}}" name="color_filter" class="dropdown-item">
-                        </label>
-                      </li>
-                      {% endfor %}
-                    {% endfor %}
-                  </ul>
-                </li>
-              </form>
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Precio
-                  </a>
-                  <ul class="dropdown-menu">
-                    
-                    <li style="text-align: center;">
-                      El precio mas alto es de $200.000
+<div class="container">
+  <div class="filters">
+    <ul class="nav nav-pills flex-column flex-sm-row">
+      <li class="nav-item">
+        <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+          <p class="nav-link">
+            <i class="bi bi-filter-square"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-filter-square" viewBox="0 0 16 16">
+              <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
+              <path d="M6 11.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"/>
+            </svg>
+            Filtrar:
+          </p>
+          <ul class="nav nav-pills">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Colores
+              </a>
+              <ul class="dropdown-menu">
+                {% for color in colors %}
+                  {% for key, value in color.items %}
+                  <form action="" method="POST">
+                    {% csrf_token %}
+                    <li>
+                      <input type="submit" value="{{ value }}" name="color_filter" class="dropdown-item" style="text-align: center;">
                     </li>
-                    
-                    <form action="" method="POST">
-                      {% csrf_token %}
-                      
-                    <li  style="text-align: center;">
-                          <div class="field py-2" id="price">
-                            <span class="field-currency">$</span>
-                            {% for price_l in price_form.price_low %}
-                            <label class="{% if price_l.errors %} errors {% endif %}">
-                            {{ price_l}}  
-                            {{ price_l.errors}}  
-                            </label>
-                            {% endfor %}
-                            <label class="field__label" for="Mobile-Filter-Precio-GTE">Desde</label>
-                          </div>
-                          
-                        </li>
-                        
-
-                        <li  style="text-align: center;">
-                          <div class="field py-2" id="price">
-                            <span class="field-currency">$</span>
-                            {% for price_h in price_form.price_hight %}
-                            <label class="{% if price_h.errors %} errors {% endif %}">
-                            {{ price_h}}  
-                            {{ price_h.errors}}  
-                            </label>   
-                            {% endfor %}                   
-                            <label class="field__label" for="Mobile-Filter-Precio-LTE">hasta</label>
-                          </div>
-
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li style="text-align: center;">
-                        <button class="btn btn-outline-dark rounded-pill mx-2" type="submit" name="filter_price" style="width:300px;">Filtrar</button>
-                        </li>
-                      </form>
-                  </ul>
-                </li>
-  
-               
-                
-            </ul>
-    </div>
-    </li>
-
-    <li class="nav-item dropdown" style="margin-left:650px;">
-      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-        ordenar por:
-      </a>
-      <ul class="dropdown-menu">
-     
-          <li>
-            <label>
-              <input type="submit" value="1" name="color_filter" class="dropdown-item">
-            </label>
-          </li>
-          <li>
-            <label>
-              <input type="submit" value="2" name="color_filter" class="dropdown-item">
-            </label>
-          </li>
-          <li>
-            <label>
-              <input type="submit" value="3" name="color_filter" class="dropdown-item">
-            </label>
-          </li>
-          <li>
-            <label>
-              <input type="submit" value="4" name="color_filter" class="dropdown-item">
-            </label>
-          </li>
-          <li>
-            <label>
-              <input type="submit" value="5" name="color_filter" class="dropdown-item">
-            </label>
-          </li>
-          <li>
-            <label>
-              <input type="submit" value="6" name="color_filter" class="dropdown-item">
-            </label>
-          </li>
-     
-      </ul>
-    </li>
-
-    <li class="nav-item dropdown">
-      <p class="nav-link"  data-bs-toggle="dropdown" aria-expanded="false">
-        {{clothes_number}} Productos
-      </p>
-      <ul class="dropdown-menu">
-        {% for color in colors %}
-          {% for key, value in color.items %}
-          <li>
-            <label>
-              <input type="submit" value="{{value}}" name="color_filter" class="dropdown-item">
-            </label>
-          </li>
+                  </form>
+                  {% endfor %}
+                {% endfor %}
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Precio
+              </a>
+              <ul class="dropdown-menu">
+                <li style="text-align: center;">El precio más alto es de $200.000</li>
+                <form action="" method="POST">
+                  {% csrf_token %}
+                  <li style="text-align: center;">
+                    <div class="field py-2" id="price">
+                      <span class="field-currency">$</span>
+                      {% for price_l in price_form.price_low %}
+                      <label class="{% if price_l.errors %} errors {% endif %}">
+                        {{ price_l }}
+                        {{ price_l.errors }}
+                      </label>
+                      {% endfor %}
+                      <label class="field__label" for="Mobile-Filter-Precio-GTE">Desde</label>
+                    </div>
+                  </li>
+                  <li style="text-align: center;">
+                    <div class="field py-2" id="price">
+                      <span class="field-currency">$</span>
+                      {% for price_h in price_form.price_hight %}
+                      <label class="{% if price_h.errors %} errors {% endif %}">
+                        {{ price_h }}
+                        {{ price_h.errors }}
+                      </label>
+                      {% endfor %}
+                      <label class="field__label" for="Mobile-Filter-Precio-LTE">Hasta</label>
+                    </div>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li style="text-align: center;">
+                    <button class="btn btn-outline-dark rounded-pill mx-2" type="submit" name="filter_price" style="width: 300px;">Filtrar</button>
+                  </li>
+                </form>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </li>
+      <li class="nav-item dropdown ms-auto">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          Ordenar por:
+        </a>
+        <ul class="dropdown-menu">
+          {% for key, value in order_by.items %}
+          <form action="" method="POST">
+            {% csrf_token %}
+            <li>
+              <input type="hidden" value="{{ value }}" name="item_order">
+              <button type="submit" class="dropdown-item" style="text-align: center;">{{ key }}</button>
+            </li>
+          </form>
           {% endfor %}
-        {% endfor %}
-      </ul>
-    </li>
-  </ul>
-
-
-   
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <p class="nav-link" data-bs-toggle="dropdown" aria-expanded="false">
+          {{ clothes_number }} Productos
+        </p>
+        <ul class="dropdown-menu">
+          {% for color in colors %}
+            {% for key, value in color.items %}
+            <li>
+              <label>
+                <input type="submit" value="{{ value }}" name="color_filter" class="dropdown-item">
+              </label>
+            </li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+      </li>
+    </ul>
+  </div>
 </div>
 

@@ -4,11 +4,12 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView
-from .models import Clothes, ImageClothes, SizeClothes, Comment
+from .models import Clothes, ImageClothes, SizeClothes
 from .forms import ClotheForm, CommentForm, PriceForm
 from django.urls import reverse
 from django.core.paginator import Paginator
 from django.contrib import messages
+from django.db.models import Q
 
 # Create your views here.
 
@@ -40,44 +41,57 @@ class AllProducts(View):
 
         filter_session = request.session.get("filters_colors")
         price_session = request.session.get("filters_price")
+        items_order = request.session.get("order_by")
+        print(items_order)
+        
+        if items_order == None:
+            items_order = "clothes__name"
         
 
-        if  (filter_session is None or len(filter_session)==0) and (price_session is None or len(price_session)==0):
-            all_products = ImageClothes.objects.all()
+       # Base QuerySet
+        all_products = ImageClothes.objects.all()
 
-        elif filter_session:
-            queryset_union = ImageClothes.objects.none()
+        # Apply color filters if present
+        if filter_session:
+            color_filters = Q()
             for color in filter_session:
-                queryset_color = ImageClothes.objects.filter(color=color)
-                # Join with existing QuerySet
-                queryset_union = queryset_union.union(queryset_color)
-            all_products = queryset_union.all()
+                color_filters |= Q(color=color)
+            all_products = all_products.filter(color_filters)
 
-        elif price_session:
-            all_products = ImageClothes.objects.filter(clothes__price__range=(price_session[0], price_session[1]))
+        # Apply price filters if present
+        if price_session:
+            price_filters = Q(clothes__price__range=(price_session[0], price_session[1]))
+            all_products = all_products.filter(price_filters)
 
-        else:
-            queryset_union = ImageClothes.objects.none()
-            price_filter = ImageClothes.objects.filter(clothes__price__range=(price_session[0], price_session[1]))
-            for color in filter_session:
-                queryset_color = ImageClothes.objects.filter(color=color)
-                # Join with existing QuerySet
-                queryset_union = queryset_union.union(queryset_color)
-            all_products = queryset_union.intersection(price_filter)
+        # Order the QuerySet
+        all_products = all_products.order_by(items_order)
 
         len_cart = 0
         if self.request.session.get("cart_clothes") is not None:
             len_cart = len(self.request.session.get("cart_clothes"))
 
-        paginator = Paginator(all_products, 3)
+
+            
+        paginator = Paginator(all_products, 6)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
+        
+
+        dict_order_by = {
+                        "Alfabeticamente, A-Z": "clothes__name",
+                         "Alfabeticamente, Z-A": "-clothes__name",
+                         "Precio, de menor a mayor": "clothes__price", 
+                         "Precio, de mayor a menor": "-clothes__price", 
+                         "Fecha: reciente a antiguo(a": "-clothes__date", 
+                         "Fecha, antiguo(a) a reciente": "clothes__date"
+                    }
         
    
         context = {
             "clothes_number": all_products.count(),
             "number": len_cart,
             "colors": ImageClothes.objects.values("color").distinct,
+            "order_by": dict_order_by,
             "price_form": PriceForm(),
             "nav_colors": filter_session,
             "nav_prices": price_session,
@@ -88,7 +102,9 @@ class AllProducts(View):
     def post(self, request):
         filter_session = request.session.get("filters_colors")
         price_session = request.session.get("filters_price")
-
+        items_order = request.session.get("order_by")
+         
+        
         if filter_session is None:
             filter_session = []
 
@@ -123,6 +139,12 @@ class AllProducts(View):
         elif "delete_price" in request.POST:
             price_session.clear()
             request.session["filters_price"] = price_session
+
+        if "item_order"  in request.POST:
+            print(request.POST["item_order"])
+            items_order = request.POST["item_order"]
+            request.session["order_by"] = items_order
+                
             
         return HttpResponseRedirect("/products/all")
 ################################################################
@@ -133,44 +155,50 @@ class ClothesByType(View):
 
         filter_session = request.session.get("filters_colors")
         price_session = request.session.get("filters_price")
-        print("ture")
+        items_order = request.session.get("order_by")
+        
+        # Base QuerySet with slug_type filter
+        type_clothes = ImageClothes.objects.filter(clothes__slug_type=slug_type)
 
-        if  (filter_session is None or len(filter_session)==0) and (price_session is None or len(price_session)==0):
-            type_clothes = ImageClothes.objects.filter(clothes__slug_type=slug_type)
-
-        elif filter_session:
-            queryset_union = ImageClothes.objects.none()
+        # Apply color filters if present
+        if filter_session:
+            color_filters = Q()
             for color in filter_session:
-                queryset_color = ImageClothes.objects.filter(clothes__slug_type=slug_type, color=color)
-                # Join with existing QuerySet
-                queryset_union = queryset_union.union(queryset_color)
-            type_clothes = queryset_union.all()
+                color_filters |= Q(color=color)
+            type_clothes = type_clothes.filter(color_filters)
 
-        elif price_session:
-            type_clothes = ImageClothes.objects.filter(clothes__slug_type=slug_type, clothes__price__range=(price_session[0], price_session[1]))
+        # Apply price filters if present
+        if price_session:
+            price_filters = Q(clothes__price__range=(price_session[0], price_session[1]))
+            type_clothes = type_clothes.filter(price_filters)
 
-        else:
-            queryset_union = ImageClothes.objects.none()
-            price_filter = ImageClothes.objects.filter(clothes__slug_type=slug_type, clothes__price__range=(price_session[0], price_session[1]))
-            for color in filter_session:
-                queryset_color = ImageClothes.objects.filter(clothes__slug_type=slug_type, color=color)
-                # Join with existing QuerySet
-                queryset_union = queryset_union.union(queryset_color)
-            type_clothes = queryset_union.intersection(price_filter)
+        # Order the QuerySet
+        type_clothes = type_clothes.order_by(items_order)
+
 
         len_cart = 0
         if self.request.session.get("cart_clothes") is not None:
             len_cart = len(self.request.session.get("cart_clothes"))
 
-        paginator = Paginator(type_clothes, 3)
+        paginator = Paginator(type_clothes, 6)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
+
+        dict_order_by = {
+                        "Alfabeticamente, A-Z": "clothes__name",
+                         "Alfabeticamente, Z-A": "-clothes__name",
+                         "Precio, de menor a mayor": "clothes__price", 
+                         "Precio, de mayor a menor": "-clothes__price", 
+                         "Fecha: reciente a antiguo(a": "-clothes__date", 
+                         "Fecha, antiguo(a) a reciente": "clothes__date"
+                    }
    
         context = {
             "clothes_number": type_clothes.count(),
             "type": slug_type,
             "number": len_cart,
             "colors": ImageClothes.objects.values("color").distinct,
+            "order_by": dict_order_by,
             "price_form": PriceForm(),
             "nav_colors": filter_session,
             "nav_prices": price_session,
@@ -216,6 +244,11 @@ class ClothesByType(View):
         elif "delete_price" in request.POST:
             price_session.clear()
             request.session["filters_price"] = price_session
+
+        if "item_order"  in request.POST:
+            print(request.POST["item_order"])
+            items_order = request.POST["item_order"]
+            request.session["order_by"] = items_order
             
         return HttpResponseRedirect("/collections/" + slug_type)
 
@@ -227,39 +260,44 @@ class ClothesByGender(View):
 
         filter_session = request.session.get("filters_colors")
         price_session = request.session.get("filters_price")
+        items_order = request.session.get("order_by")
 
+         # Base QuerySet with slug_type filter
+        gender_clothes = ImageClothes.objects.filter(clothes__gender=gender)
 
-        if  (filter_session is None or len(filter_session)==0) and (price_session is None or len(price_session)==0):
-            gender_clothes = ImageClothes.objects.filter(clothes__gender=gender)
-
-        elif filter_session:
-            queryset_union = ImageClothes.objects.none()
+        # Apply color filters if present
+        if filter_session:
+            color_filters = Q()
             for color in filter_session:
-                queryset_color = ImageClothes.objects.filter(clothes__gender=gender, color=color)
-                # Join with existing QuerySet
-                queryset_union = queryset_union.union(queryset_color)
-            gender_clothes = queryset_union.all()
+                color_filters |= Q(color=color)
+            gender_clothes = gender_clothes.filter(color_filters)
 
-        elif price_session:
-            gender_clothes = ImageClothes.objects.filter(clothes__gender=gender, clothes__price__range=(price_session[0], price_session[1]))
+        # Apply price filters if present
+        if price_session:
+            price_filters = Q(clothes__price__range=(price_session[0], price_session[1]))
+            gender_clothes = gender_clothes.filter(price_filters)
 
-        else:
-            queryset_union = ImageClothes.objects.none()
-            price_filter = ImageClothes.objects.filter(clothes__gender=gender, clothes__price__range=(price_session[0], price_session[1]))
-            for color in filter_session:
-                queryset_color = ImageClothes.objects.filter(clothes__gender=gender, color=color)
-                # Join with existing QuerySet
-                queryset_union = queryset_union.union(queryset_color)
-            gender_clothes = queryset_union.intersection(price_filter)
+        # Order the QuerySet
+        gender_clothes = gender_clothes.order_by(items_order)
+
+        
         
         len_cart = 0
         if self.request.session.get("cart_clothes") is not None:
             len_cart = len(self.request.session.get("cart_clothes"))
 
-        paginator = Paginator(gender_clothes, 3)
+        paginator = Paginator(gender_clothes, 6)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         
+        dict_order_by = {
+                        "Alfabeticamente, A-Z": "clothes__name",
+                         "Alfabeticamente, Z-A": "-clothes__name",
+                         "Precio, de menor a mayor": "clothes__price", 
+                         "Precio, de mayor a menor": "-clothes__price", 
+                         "Fecha: reciente a antiguo(a": "-clothes__date", 
+                         "Fecha, antiguo(a) a reciente": "clothes__date"
+                    }
    
         context = {
             "clothes": gender_clothes,
@@ -267,6 +305,7 @@ class ClothesByGender(View):
             "gender": gender,
             "number": len_cart,
             "colors": ImageClothes.objects.values("color").distinct,
+            "order_by": dict_order_by,
             "price_form": PriceForm(),
             "nav_colors": filter_session,
             "nav_prices": price_session,
@@ -312,6 +351,11 @@ class ClothesByGender(View):
         elif "delete_price" in request.POST:
             price_session.clear()
             request.session["filters_price"] = price_session
+
+        if "item_order"  in request.POST:
+            print(request.POST["item_order"])
+            items_order = request.POST["item_order"]
+            request.session["order_by"] = items_order
             
         return HttpResponseRedirect("/collection/" + gender)
 
@@ -346,10 +390,15 @@ def clothe_details(request, slug):
             if form.is_valid():
                 post_color = request.POST["color"]
                 post_size = request.POST["size"]
-                sizes_clothes = SizeClothes.objects.get(color_clothe__clothes__slug=slug, color_clothe__color=post_color, size=post_size )
+                try:
+                    sizes_clothes = SizeClothes.objects.get(color_clothe__clothes__slug=slug, color_clothe__color=post_color , size=post_size )
+                    if int(request.POST["cant"]) > sizes_clothes.cant:
+                        is_enough = False
                 
-                if int(request.POST["cant"]) > sizes_clothes.cant:
+                except Exception:
+                    sizes_clothes = None
                     is_enough = False
+
                 context = {
                     "color_clothes": color_clothes,
                     "clothe_details": clothe_select,

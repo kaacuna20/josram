@@ -60,17 +60,4 @@ class CommentForm(forms.ModelForm):
 class PriceForm(forms.Form):
     price_low = forms.IntegerField( min_value=0, initial=0, max_value=200000)
     price_hight = forms.IntegerField(min_value=0, max_value=200000)
-    """def __init__(self, cant, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        cant +=1
-        self.fields['cant_product'] = forms.IntegerField(
-            label="CANTIDAD", initial=cant
-        )"""
-
-    
-    
-
-#    user_name = forms.CharField(label="your name", max_length=100, error_messages={
-#        "required": "your name must not be empty",
-#        "max_length": "Please enter a shorter name!"
-#    })
+   

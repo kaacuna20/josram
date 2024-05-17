@@ -32,8 +32,118 @@
         text-align: center
     }
 
-    
+    .card.size-image-small img {
+      
+        object-fit: cover;
+    }
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        padding-top: 60px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.9);
+    }
 
+    .modal-content {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+    }
+
+    .close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #fff;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: #bbb;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+        .miniaturas {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .miniaturas li {
+            margin-bottom: 10px;
+        }
+
+        .col-md-5 {
+            margin-left: 0;
+        }
+    }
+
+    /* Adjust the size of the images */
+    .card.size-image-small img {
+        width: 100%; /* Make the images fill the entire width of their container */
+        height: auto; /* Maintain aspect ratio */
+    }
+
+    /* Adjust the size of the columns */
+    .col {
+        flex: 0 0 auto; /* Allow the columns to shrink or grow as needed */
+        width: 25%; /* Each column occupies 25% of the row's width */
+    }
+
+    /* Adjust spacing between columns */
+    .col:not(:last-child) {
+        margin-right: 10px; /* Add some margin between columns */
+    }
+
+    /* Adjust spacing around the section */
+    #details {
+        padding: 0.5rem; /* Add padding to the section */
+    }
+
+    .featurette .col-md-5 {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 700px; /* Adjust this height as needed */
+        overflow: auto;
+      }
+
+    .featurette .col-md-5::-webkit-scrollbar {
+        display: none; /* Hide scrollbar for WebKit browsers */
+      }
+    
+      .featurette .col-md-5 {
+        -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
+        scrollbar-width: none;  /* Hide scrollbar for Firefox */
+      }
+
+      .details-content {
+        flex-grow: 1;
+        overflow-y: auto;
+      }
+    
+      .py-2 {
+        margin-top: 10px;
+      }
+
+      
+#comments {
+    margin: 3rem auto 3rem auto;
+    padding: 0rem;
+    background-color: white;
+    justify-content: center;
+}
 </style>
 {% endblock %}
 
@@ -42,66 +152,57 @@
 <section id="details">
     <div class="row featurette" style="justify-content: center; margin: 0 0.5rem 0 0.5rem;">
 
-        <div class="col-md-5 order-md-1">
-            <img id="main-image" src="{{ color_clothes.0.main_image.url }}" class="card-img-top" alt="...">
-        <div id="carouselExampleIndicators" class="carousel slide">
-                <div class="carousel-inner">
-                   
-                    {% for photo in color_clothes%}
-                    <div class="carousel-item active ">
+        <div class="col-md-5 order-md-1 justify-content-center align-items-center" >
+            <img id="main-image" src="{{ color_clothes.0.main_image.url }}" class="card-img-top" alt="..." onclick="openModal()">
+            <div id="carouselExampleIndicators" class="carousel slide">
+                <div class="carousel-inner  d-flex">
+                    {% for photo in color_clothes %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
                         <ul class="miniaturas">
-                        
                             <div class="row pt-3">
-                                    <div class="col">
-                                        <div class="card size-image-small" >
-                                            <img src="{{ photo.main_image.url }}" 
-                                            class="card-img-top" alt="{{clothe_details.name}}-{{ photo.color }}-1" 
-                                            onclick="changeImage('{{ photo.main_image.url }}')" 
-                                            style="cursor: pointer; ">
-                                        </div>
+                                <div class="col-3">
+                                    <div class="card size-image-small">
+                                        <img src="{{ photo.main_image.url }}" class="card-img-top" alt="{{ clothe_details.name }}-{{ photo.color }}-1" style="cursor: pointer;" onclick="showImage('{{ photo.main_image.url }}')">
                                     </div>
-                                    <div class="col">
-                                        <div class="card size-image-small" >
-                                            <img src="{{ photo.model_image_1.url }}" 
-                                            class="card-img-top" alt="{{clothe_details.name}}-{{ photo.color }}-2" 
-                                            onclick="changeImage('{{ photo.model_image_1.url }}')" 
-                                            style="cursor: pointer; ">
-                                        </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="card size-image-small">
+                                        <img src="{{ photo.model_image_1.url }}" class="card-img-top" alt="{{ clothe_details.name }}-{{ photo.color }}-2" style="cursor: pointer;" onclick="showImage('{{ photo.model_image_1.url }}')">
                                     </div>
-                                    <div class="col">
-                                        <div class="card size-image-small" >
-                                            <img src="{{ photo.model_image_2.url }}" 
-                                            class="card-img-top" alt="{{clothe_details.name}}-{{ photo.color }}-3" 
-                                            onclick="changeImage('{{ photo.model_image_2.url }}')" 
-                                            style="cursor: pointer; ">
-                                        </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="card size-image-small">
+                                        <img src="{{ photo.model_image_2.url }}" class="card-img-top" alt="{{ clothe_details.name }}-{{ photo.color }}-3" style="cursor: pointer;" onclick="showImage('{{ photo.model_image_2.url }}')">
                                     </div>
-                                    <div class="col">
-                                        <div class="card size-image-small" >
-                                            <img src="{{ photo.other_image.url }}"
-                                            class="card-img-top" alt="{{clothe_details.name}}-{{ photo.color }}-4" 
-                                            onclick="changeImage('{{ photo.other_image.url }}')" 
-                                            style="cursor: pointer; ">
-                                        </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="card size-image-small">
+                                        <img src="{{ photo.other_image.url }}" class="card-img-top" alt="{{ clothe_details.name }}-{{ photo.color }}-4" style="cursor: pointer;" onclick="showImage('{{ photo.other_image.url }}')">
                                     </div>
+                                </div>
                             </div>
                         </ul>
                     </div>
-            {% endfor %}
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-              </button>
-              <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
         </div>
-    </div>
 
-              
+              <!-- Modal -->
+<div id="imageModal" class="modal" onclick="closeModal()">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="modal-image">
+</div>
         
-        </div>
+       
 
         <div class="col-md-5 order-md-1" style= "margin-left: 50px; ">
             <div>
@@ -115,6 +216,7 @@
                 {% if not size_clothes.in_stock %}
                 <span class="span-stock">Agotado</span></h4>
                 {% endif %}
+                
             </div>
 
             <div class="py-2">
@@ -143,14 +245,15 @@
             
                     <h4 class="mt-2">{{ form.cant.label_tag }}</h4>
                     
-                    <span> {{size_clothes.cant}} en inventario/Carrito - id:{{size_clothes.pk}}</span>
+                    <!--<span> {{size_clothes.cant}} en inventario/Carrito - id:{{size_clothes.pk}}</span>-->
                     
                     <div class="py-2" >
                         <label id="quantity" style="border-radius: 50%;">
                             
                         {{ form.cant }}
                         </label>
-                    </div> 
+                    </div>
+                    
 
                     {% if not is_enough %}
                     <span style="font-style: italic;">
@@ -172,7 +275,7 @@
                     </span>
                     {% endif %}
                     <div class="py-2">
-                    <button class="btn btn-outline-primary rounded-pill" type="submit" name="verify">Verificar stock</button>
+                    <button class="btn btn-warning rounded-pill" type="submit" name="verify">Verificar stock</button>
                     </div>
                     </form>
                 
@@ -223,6 +326,8 @@
                 </form>
                 {% endif %}
 
+                
+
     
             <div class="py-2">
                 <p style="text-align: justify; font-family: 'Lato', sans-serif;">
@@ -242,7 +347,7 @@
     </div>
 </section>
 
-<section id="details">
+<section id="comments">
     <div class="accordion" id="accordionExample">
         <div class="accordion-item">
             <h2 class="accordion-header">
@@ -284,10 +389,11 @@
                     <div class="accordion-body">
                     <div class="my-3 p-3 bg-body rounded shadow-sm">
                         <h5 class="border-bottom pb-2 mb-2">Reseñas</h5>
+                        {% if comment %}
                         {% for comment in comments %}
                         <div class="pb-3 mb-0 small lh-sm border-bottom w-100 mt-2 mb-0 py-0">
                             <div class="row">
-                            <div class="col-1 mx-0 py-0" styles="border: 2px solid black; ">
+                            <div class="col-lg-1 mx-0 py-0" styles="border: 2px solid black; ">
                                 <p style="font-size: 32px; font-weight: 700; margin-bottom:0px; margin-left: 15px;">
                                     {{ comment.rating}}.0
                                     <div style=" float: none;
@@ -298,20 +404,26 @@
                                 </p>
                                 
                             </div>
-                            <div class="col">
-                                <div class="d-flex justify-content-between my-0">
-                                    <strong class="text-gray-dark" style="font-size: 20px;">@{{comment.user_name}}</strong>
-                                    <p>{{ comment.date|date:"d/m/Y"}}</p> 
+                            <div class="col-lg-9 ">
+                                <div class="d-flex justify-content-between ">
+                                    <strong class="text-gray-dark mx-2" style="font-size: 20px;">@{{comment.user_name}}</strong>
+                                     
                                 </div>
-                                <span class="d-block my-0">{{ comment.comment}}</span>
+                                <span class="d-block mt-1 mx-2">{{ comment.comment}}</span>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="d-flex justify-content-between mx-2">
+                                    <p >{{ comment.date|date:"d/m/Y"}}</p>
+                                </div>
+                              
                             </div>
                         </div>
                         </div>
                         {% endfor %}
-                 
-                        <small class="d-block text-end mt-3">
-                        <a href="#">All updates</a>
-                        </small>
+                        {% else %}
+                        <h5 class=" pb-2 mb-2">No hay reseñas hasta el momento!</h5>
+                        {% endif %}
+                        
                     </div>
                 </div>
             </div>
@@ -331,18 +443,22 @@
 </script>
 <!-- JavaScript para mantener la selección  
                 -->
-<script>
-    function selectButton(button, groupClass) {
-        // Desseleccionar todos los botones en el grupo
-        var buttons = document.querySelectorAll('.' + groupClass);
-        buttons.forEach(function(btn) {
-            btn.classList.remove('selected');
-        });
 
-        // Seleccionar el botón actual
-        button.classList.add('selected');
-    }
-</script>
+    <script>
+        function showImage(url) {
+            document.getElementById('main-image').src = url;
+          }
+        
+          function openModal() {
+            document.getElementById('imageModal').style.display = "block";
+            document.getElementById('modal-image').src = document.getElementById('main-image').src;
+          }
+        
+          function closeModal() {
+            document.getElementById('imageModal').style.display = "none";
+          }
+    </script>
+
 <!-- JavaScript para el desplazamiento del carrusel -->
 
 

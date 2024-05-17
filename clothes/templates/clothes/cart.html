@@ -18,152 +18,99 @@ Tu carrito - JOSRAM
 {% block content %}
 
 <section id="header">
-    {% if not has_clothes %}
-    <div>
-        <h1> No tienes ningun elemento en el carrito </h1>
-    </div>
-    {% else %}
-    <div>
-        <h1> Tu carrito </h1>
-    </div>
-    
-    
-    <table class="table">
+
+
+    <div class="container">
+        {% if not has_clothes %}
+        <div>
+            <h1> No tienes ningun elemento en el carrito </h1>
+        </div>
+        {% else %}
+        <div>
+            <h1> Tu carrito </h1>
+        </div>
         <div class="row mb-2">
-        <div class="col-md-12">
-        <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 ">
-        <thead>
-          <tr>
-            <th scope="col">Producto</th>
-            <th scope="col"></th>
-            <th scope="col">Cantidad</th>
-            <th scope="col">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-           
-            {% for clothe in carts %}
-          <tr>
-            <td>
-                <!--width="200" height="250"-->
-                <div class="col-auto d-none d-lg-block">
-                    <img  src="{{ clothe.img }}" class="card-img-top" alt="..." width="200" height="250">
-                </div>
-           </td>
-            <td>
-                <div class="col p-4 d-flex flex-column position-static">
-                    <strong class="d-inline-block mb-2 text-primary-emphasis">{{clothe.color_clothe.clothes.get_type_display}}</strong>
-                    <a href="{% url "clothes-details" clothe.slug  %}"><h3 class="mb-0">{{clothe.name}}</h3></a>
-                    {% load custom_filters %}
-                    <div id="precio_unitario" class="mb-1 text-body-secondary">{{clothe.price|currency}}COP</div>
-                    <p class="card-text mb-auto">Talla: {{clothe.size}}</p>
-                    
-                      Color: {{clothe.color}}
-                      <svg class="bi"><use xlink:href="#chevron-right"></use></svg>
-                    
-                  </div>
-            </td>
-            <td>
-                <div class="col p-4 d-flex flex-column position-static">
-                    <form method="post">
-                        {% csrf_token %}
-                    <div id="cantidad">
-                        <!--<button type="submit"  onclick="actualizarCantidad({{ clothe.size_pk }}, 'decrementar')">-</button>-->
-                        
-                        <button type="button"  onclick="actualizarCantidad({{ clothe.size_pk }}, 'decrementar')">-</button>
-                        <input type="number" id="cant_product_{{ clothe.size_pk }}" name="cant_product"
-                           value="{{ clothe.quantity}}" min="1" readonly size="30px">
-                           <button type="button" onclick="actualizarCantidad({{ clothe.size_pk }}, 'incrementar')">+</button>
-                        
-                    </form>
-                        <!--<button type="submit" onclick="actualizarCantidad({{ clothe.size_pk }}, 'incrementar')">+</button>-->
-                        <form method="post">
-                            {% csrf_token %}
-                        <button >
-                        <input type="hidden" value="{{ clothe.size_pk }}" name="sizes_pk">
-                        <input type="hidden" value="{{ clothe.quantity}}" name="sizes_cant">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-                          </svg>
-                        </button>
-                    </form>
+            <div class="col-12">
+                <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table text-center">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Producto</th>
+                                        <th scope="col"></th>
+                                        <th scope="col">Cantidad</th>
+                                        <th scope="col">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for clothe in carts %}
+                                    <tr>
+                                        <td class="col-md-3 col-sm-12 align-middle">
+                                            <div class="col-auto d-lg-block">
+                                                <img src="{{ clothe.img }}" class="img-fluid mx-auto d-block" alt="..." style="width: 100px; height: auto; border-radius:8px;">
+                                            </div>
+                                        </td>
+                                        <td class="col-md-3 col-sm-12 align-middle">
+                                            <div class="p-4 d-flex flex-column position-static">
+                                                <strong class="d-inline-block mb-2 text-primary-emphasis">{{ clothe.color_clothe.clothes.get_type_display }}</strong>
+                                                <a href="{% url "clothes-details" clothe.slug %}"><h3 class="mb-0">{{ clothe.name }}</h3></a>
+                                                {% load custom_filters %}
+                                                <div id="precio_unitario" class="mb-1 text-body-secondary">{{ clothe.price|currency }} COP</div>
+                                                <p class="card-text mb-auto">Talla: {{ clothe.size }}</p>
+                                                Color: {{ clothe.color }}
+                                            </div>
+                                        </td>
+                                        <td class="col-md-3 col-sm-6 align-middle">
+                                            <div class="p-4 d-flex justify-content-center align-items-center">
+                                                <form method="post" class="d-flex align-items-center">
+                                                    {% csrf_token %}
+                                                    <input type="number" id="cant_product_{{ clothe.size_pk }}" name="cant_product"
+                                                           value="{{ clothe.quantity }}" min="1" readonly class="form-control text-center" style="width: 60px;">
+                                                    <input type="hidden" value="{{ clothe.size_pk }}" name="sizes_pk">
+                                                    <input type="hidden" value="{{ clothe.quantity }}" name="sizes_cant">
+                                                    <button class="btn btn-danger rounded-pill ms-2">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                                                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                        <td class="col-md-3 col-sm-6 align-middle">
+                                            <div class="p-4 d-flex flex-column position-static">
+                                                {% load custom_filters %}
+                                                <span id="total_price_{{ clothe.size_pk }}" class="total_price">{{ clothe.total_price|currency }}</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </td>
-            <td>
-                <div class="col p-4 d-flex flex-column position-static">
-                    {% load custom_filters %}
-                    <span id="total_price_{{ clothe.size_pk }}" class="total_price">{{ clothe.total_price|currency }}</span>                    
-                </div>
-            </td>
-          </tr>
-        
-          {% endfor%}
-        </tbody>
             </div>
         </div>
-    </div>
-      </table>
-    
-      <div>
-        
-        <h2>
-            {% load custom_filters %}
-            SUBTOTAL: <span id="total_general">{{ sum_prices|currency }}</span></h2>
-        </h2>
-        <form action="{% url "cheackout-buy"  %}" method="POST">
-            {% csrf_token %}
-        {% endif %}
-        <div class="py-2">
-                            
-            <button type="submit" name="proceed_to_checkout" class="btn btn-outline-dark rounded-pill mt-2" style="width:400px">Ir a comprar</button>
+
+        <div>
+            <h2>
+                {% load custom_filters %}
+                SUBTOTAL: <span id="total_general">{{ sum_prices|currency }}</span>
+            </h2>
+            <form action="{% url "cheackout-buy" %}" method="POST">
+                {% csrf_token %}
+                <div class="py-2">
+                    <button type="submit" name="proceed_to_checkout" class="btn btn-outline-dark rounded-pill mt-2 w-100 w-lg-50">Ir a comprar</button>
+                </div>
+            </form>
         </div>
-        </form>
-      </div>
+    </div>
+    {% endif %}
 </section>
 
 <script>
-    function actualizarCantidad(size_pk, accion) {
-        // Crear objeto XMLHttpRequest para enviar solicitud AJAX
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "", true);  # Enviar POST a la misma vista
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");  # CSRF Token
-
-        // Al recibir respuesta, actualizar la interfaz
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                var response = JSON.parse(xhr.responseText);  # Parsear JSON
-                var quantity = response.quantity;
-                var total_price = response.total_price;
-                var sum_prices = response.sum_prices;
-
-                // Actualizar el precio total del ítem
-                document.getElementById("total_price_" + size_pk).textContent = total_price.toFixed(2);
-
-                // Actualizar la cantidad en el campo de entrada
-                document.getElementById("cant_product_" + size_pk).value = quantity;
-
-                // Actualizar el total general
-                var sum_prices = 0;
-                document.querySelectorAll(".total_price").forEach(function (el) {
-                    total_general += parseFloat(el.textContent);
-                });
-                document.getElementById("total_general").textContent = sum_prices.toFixed(2);
-            }
-          } else {
-            console.error("Error al actualizar la cantidad");
-        }
-        };
-
-        // Enviar la solicitud POST con el ID de la talla y la acción a realizar
-        var data = {
-          'size_pk': size_pk,
-          'accion': accion
-      };
-
-      xhr.send(JSON.stringify(data));;  # Enviar solicitud POST
-  
+    
 </script>
 {% endblock %}

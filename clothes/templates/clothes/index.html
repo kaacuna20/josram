@@ -8,30 +8,66 @@ JOSRAM
 
 {% block css_files %}
 <link rel="stylesheet" href="{% static "clothes/index.css" %}"/>
+<style>
+  /* Custom CSS for responsive images */
+.img-responsive {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Adjust the height for different breakpoints */
+@media (min-width: 1200px) { /* Large screens (lg) */
+    .carousel-inner img {
+        height: 600px;
+        object-fit: cover;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1199.98px) { /* Medium screens (md) */
+    .carousel-inner img {
+        height: 500px;
+        object-fit: cover;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) { /* Small screens (sm) */
+    .carousel-inner img {
+        height: 400px;
+        object-fit: cover;
+    }
+}
+
+@media (max-width: 767.98px) { /* Extra small screens (xs) */
+    .carousel-inner img {
+        height: 300px;
+        object-fit: cover;
+    }
+}
+</style>
 {% include "clothes/includes/style.html" %}
 {% endblock %}
 
 {% block content %}
 
    
-    <div id="carouselExample" class="carousel slide">
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-            <a href=""><img  src="{% static "clothes/images/pag.png" %}" alt="porque-hacer-deporte"></a>
-          </div>
-          <div class="carousel-item">
-            <a href=""><img src="{% static "clothes/images/pag2.png" %}" alt="porque-hacer-deporte"></a>
-          </div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-        </button>
+<div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+      <div class="carousel-item active">
+          <a href=""><img class="d-block w-100 img-responsive" src="{% static 'clothes/images/pag.png' %}" alt="porque-hacer-deporte"></a>
       </div>
+      <div class="carousel-item">
+          <a href=""><img class="d-block w-100 img-responsive" src="{% static 'clothes/images/pag2.png' %}" alt="porque-hacer-deporte"></a>
+      </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+  </button>
+</div>
 
 <section id="nuevo">
     <div>
@@ -42,7 +78,7 @@ JOSRAM
       <div class="row">
         {% for clothe in clothes %}
         
-          <div class="col">
+          <div class="col-lg-3 my-2 ">
               <div class="card" style="width: 18rem;">
                 <a href="{% url "clothes-details"  clothe.clothes.slug %}">
                 <div class="hover-card">
@@ -51,10 +87,11 @@ JOSRAM
                 </div>
                   <div class="card-body">
                     <p class="card-text">{{clothe.clothes.name|title}}.</p>
+                  </a>
                     {% load custom_filters %}
                     <p class="card-text"> {{ clothe.clothes.price|currency}}</p>
                   </div>
-                </a>
+                
                 </div>
           </div>
           {% endfor %}
