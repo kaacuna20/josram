@@ -1,0 +1,136 @@
+{% extends "clothes/base.html" %}
+  {% load static %}
+
+  {% block title %}
+  Búsqueda: {{clothes_number}} resultados encontrados a "{{query }}"
+  {% endblock %}
+
+  {% block css_files %}
+  <link rel="stylesheet" href="{% static 'clothes/all-products.css' %}"/>
+  <style>
+    /* Additional CSS for hover effects */
+    .hover-card {
+      position: relative;
+    }
+
+    .imagen-2 {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .hover-card:hover .imagen-2 {
+      opacity: 1;
+    }
+
+    .card img {
+      width: 100%;
+      height: auto;
+    }
+  </style>
+  {% include 'clothes/includes/style.html' %}
+  {% endblock %}
+
+  {% block content %}
+  <section id="header">
+    <div>
+      <h1> Resultados de tu búsqueda </h1>
+    </div>
+    {% if query %}
+    {% if clothes %}
+
+
+    <div class="filters">
+    
+      <ul class="nav nav-pills">
+        {% if nav_colors %}
+        {% for color in nav_colors %}
+        <form action="{% url 'search' %}" method="POST">
+          {% csrf_token %}
+          <li class="nav-item dropdown">
+            <label class="btn btn-outline-dark rounded-pill px-3">
+              <input type="hidden" value="{{ color }}" name="color">
+              {{color}}
+              <button type="submit" name="delete_color" class="btn-close" aria-label="Close"></button>
+            </label>
+          </li>
+        </form>
+        {% endfor %}
+        {% endif %}
+
+        {% if nav_prices %}
+        <form action="{% url 'search' %}" method="POST">
+          {% csrf_token %}
+          <li class="nav-item dropdown">
+            <label class="btn btn-outline-dark rounded-pill px-3">
+              {% load custom_filters %}
+              <input type="hidden" value="{{ nav_prices }}" name="price">
+              {{nav_prices.0|currency}} - {{nav_prices.1|currency}}
+              <button type="submit" name="delete_price" class="btn-close" aria-label="Close"></button>
+            </label>
+          </li>
+        </form>
+        {% endif %}
+
+        {% if nav_prices or nav_colors %}
+        <form action="{% url 'search' %}" method="POST">
+          {% csrf_token %}
+          <li class="nav-item dropdown">
+            <button class="btn btn-secondary rounded-pill px-3" type="submit" name="delete_filters">
+              Eliminar todos
+            </button>
+          </li>
+        </form>
+        {% endif %}
+      </ul>
+    </div>
+
+    <div class="album py-5 bg-body-tertiary">
+      <div class="container">
+        
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            
+            <!-- Display pagination controls -->
+            {% for clothe in clothes %}
+            <div class="col">
+                <div class="card shadow-sm">
+                <a href="{% url 'clothes-details' clothe.color_clothe.clothes.slug %}">
+                    <div class="hover-card">
+                    <img src="{{ clothe.color_clothe.main_image.url }}" class="card-img-top imagen-1" alt="{{ clothe.color_clothe.clothes.name }}">
+                    <img src="{{ clothe.color_clothe.model_image_1.url }}" class="card-img-top imagen-2" alt="{{ clothe.color_clothe.clothes.name }}">
+                    </div>
+                    <div class="card-body">
+                    <p class="card-text">{{ clothe.color_clothe.clothes.name|title }}</p>
+                    </a>
+                    <div class="d-flex justify-content-between align-items-center">
+                    {% load custom_filters %}
+                    <p class="text-body-secondary">{{ clothe.color_clothe.clothes.price|currency }}</p>
+                    </div>
+                </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div>
+                <h3>No se encontraron resultados para “{{query}}” Revisa la ortografía o usa una palabra o frase diferente.</h3>
+            </div>
+            {% endif %}
+            </div>
+     
+        
+      </div>
+    </div>
+    {% else %}
+    <div class="mt-5">
+        <h3>Agrega una consulta a tu busqueda!</h3>
+      </div>
+    {% endif %}
+  </section>
+  
+
+  {% endblock %}
+      

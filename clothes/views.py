@@ -358,6 +358,50 @@ class ClothesByGender(View):
             request.session["order_by"] = items_order
             
         return HttpResponseRedirect("/collection/" + gender)
+    
+
+class SearhView(View):
+    
+    def get(self, request):
+
+        query = request.GET.get('q')
+        split_query = query.split(" ") if query else []
+        combined_results = SizeClothes.objects.none()  # Initialize an empty QuerySet
+
+        if query:
+            for q in split_query:
+                result = SizeClothes.objects.filter(
+                    Q(size__icontains=q) |
+                    Q(color_clothe__color__icontains=q) |
+                    Q(color_clothe__clothes__name__icontains=q) |
+                    Q(color_clothe__clothes__type__icontains=q) |
+                    Q(color_clothe__clothes__gender__icontains=q)       
+                )
+                combined_results = combined_results.union(result)  # Union with accumulated results
+
+            # Remove duplicates manually
+            seen = set()
+            distinct_results = []
+            for item in combined_results:
+                identifier = item.color_clothe.color  # Use a tuple to identify unique items
+                if identifier not in seen:
+                    seen.add(identifier)
+                    distinct_results.append(item)
+        else:
+            distinct_results = []
+
+        len_cart = 0
+        if self.request.session.get("cart_clothes") is not None:
+            len_cart = len(self.request.session.get("cart_clothes"))
+
+        context = {
+            "query": query,
+            "clothes": distinct_results,
+            "clothes_number": len(distinct_results),
+            "number": len_cart,
+        }
+        return render(request, "clothes/search_results.html", context)
+
 
 
 def clothe_details(request, slug):
@@ -605,9 +649,6 @@ class CheckOutView(View):
                 request.session["cart_clothes"] = stored_clothes
 
         return HttpResponseRedirect("/checkout")
-
-
-
 
 
 

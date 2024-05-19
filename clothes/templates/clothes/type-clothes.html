@@ -22,7 +22,7 @@ JOSRAM - {{type.title}}
     <div>
         <h1>{{type.title}} </h1>
     </div>
-
+    {% if page_obj %}
     {% include "clothes/includes/header-filter.html" %}
    
     <div class="filters">
@@ -74,7 +74,7 @@ JOSRAM - {{type.title}}
             <div class="album py-0 bg-body-tertiary">
               <div class="container">
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-                  {% if page_obj %}
+                  
                   {% for clothe in page_obj.object_list %}
                   
                       <div class="col">
