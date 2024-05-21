@@ -1,0 +1,43 @@
+
+<html>
+<head>
+    <script src="https://sdk.mercadopago.com/js/v2">
+    </script>
+</head>
+<body>
+  <!--// SDK MercadoPago.js-->
+  
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+ 
+    <a href="{{preference.init_point}}"> IR A PAGAR </a>
+    <div id="wallet_container">
+    </div>
+    <script>
+      const mp = new MercadoPago('TEST-22995420-b4c4-4143-acfb-a790d7f2fbb5', {
+        locale: 'es-CO'
+      });
+
+      mp.bricks().create("wallet", "wallet_container", {
+        initialization: {
+            preferenceId: "<wallet_container>",
+            redirectMode: "blank"
+        },
+        customization: {
+            texts: {
+             valueProp: 'smart_option',
+            },
+            },
+        callbacks: {
+                onReady: () => {},
+                onSubmit: () => {},
+                onError: (error) => console.error(error),
+              },
+    });
+      
+  </script>
+
+</body>
+</html>
+        
+
+
