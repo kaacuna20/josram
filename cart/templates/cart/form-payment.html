@@ -1,43 +1,39 @@
 
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <script src="https://sdk.mercadopago.com/js/v2">
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
 </head>
 <body>
-  <!--// SDK MercadoPago.js-->
-  
-  <script src="https://sdk.mercadopago.com/js/v2"></script>
- 
-    <a href="{{preference.init_point}}"> IR A PAGAR </a>
-    <div id="wallet_container">
-    </div>
+    <h1>Buy now!</h1>
+    <div id="checkout-button"></div>
+
     <script>
-      const mp = new MercadoPago('TEST-22995420-b4c4-4143-acfb-a790d7f2fbb5', {
-        locale: 'es-CO'
-      });
+        const mp = new MercadoPago('APP_USR-85af6e00-9e3a-4b51-bebd-d78f3be329b8', {
+            locale: 'en-US'
+        });
 
-      mp.bricks().create("wallet", "wallet_container", {
-        initialization: {
-            preferenceId: "<wallet_container>",
-            redirectMode: "blank"
-        },
-        customization: {
-            texts: {
-             valueProp: 'smart_option',
+        fetch('/create_preference', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
             },
-            },
-        callbacks: {
-                onReady: () => {},
-                onSubmit: () => {},
-                onError: (error) => console.error(error),
-              },
-    });
-      
-  </script>
-
+        })
+        .then(response => response.json())
+        .then(preference => {
+            mp.checkout({
+                preference: {
+                    id: preference.id
+                },
+                render: {
+                    container: '#checkout-button',
+                    label: 'Pay',
+                }
+            });
+        });
+    </script>
 </body>
 </html>
-        
-
-

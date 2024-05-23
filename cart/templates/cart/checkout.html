@@ -8,228 +8,280 @@ sección de pago
 
 {% block css_files %}
 <link rel="stylesheet" href="{% static "cart/checkout.css" %}"/>
-<styles>
-    
-</styles>
+ <!-- Bootstrap CSS -->
+ <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+ <!-- Font Awesome -->
+ <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+<style>
+  .card-body {
+      text-align: center;
+  }
+  .payment-icon {
+    font-size: 3rem;
+    margin: 10px;
+    display: block;
+}
+.payment-title {
+    font-size: 1.2rem;
+    margin-top: 5px;
+}
+.card-body {
+    text-align: center;
+}
+.list-group-item img {
+    width: 50px;
+    height: 50px;
+}
+@media (max-width: 576px) {
+    .payment-icon {
+        font-size: 2rem;
+    }
+    .payment-title {
+        font-size: 1rem;
+    }
+    .list-group-item img {
+        width: 40px;
+        height: 40px;
+    }
+}
+#main {
+  margin: 3rem auto 3rem auto;
+  padding: 0;
+  background-color: rgb(247, 246, 246);
+  justify-content: center;
+}
+@media (min-width: 992px) {
+  .fixed-column {
+    position: sticky; /* Change to sticky */
+    top: 0;
+    height: 100vh; /* Set fixed height to fill the viewport */
+    overflow-y: auto; /* Add vertical scrolling */
+    z-index: 1000;
+  }
+
+  .scrollable-column {
+    padding-left: 0px; /* Adjust the padding instead of margin */
+  }
+}
+
+</style>
 {% include "cart/includes/style.html" %}
 {% endblock %}
 
 
 {% block content %}
 <section id="main">
-
-      
-            <div class="row g-5">
-                <div class="col-md-5 col-lg-4 order-md-last">
-                  <h4 class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="text-primary">Tu carrito</span>
-                    <span class="badge bg-primary rounded-pill">{{number}}</span>
-                  </h4>
-                  <ul class="list-group mb-3">
-                    {% for clothe in carts %}
-                    <li class="list-group-item d-flex justify-content-between lh-sm">
-                      
+  <div class="container mt-0">
+      <div class="row g-5">
+          <div class="col-md-5 col-lg-4 order-md-last fixed-column">
+              <h4 class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="text-primary">Tu carrito</span>
+                  <span class="badge bg-primary rounded-pill">{{number}}</span>
+              </h4>
+              <ul class="list-group mb-1">
+                  {% for clothe in carts %}
+                  <li class="list-group-item d-flex justify-content-between lh-sm">
                       <div>
-                        <picture>
-                        
-                        <img  src="{{ clothe.img }}" class="card-img-top" alt="..." width="50" height="50">
-                        
-                        </picture>
+                          <picture>
+                              <img src="{{ clothe.img }}" class="img-fluid" alt="..." style="border-radius:8px;">
+                          </picture>
+                      </div>
+                      <div class="ms-3">
+                          <h6 class="my-0">{{ clothe.name }}</h6>
+                          <small class="text-body-secondary">Talla {{ clothe.size }}</small>
+                          <div>
+                              <small class="text-body-secondary">{{ clothe.quantity }} Uds.</small>
+                          </div>
                       </div>
                       <div>
-                        <h6 class="my-0">{{ clothe.name }}</h6>
-                        <small class="text-body-secondary">Talla {{ clothe.size }}</small>
-                        <div>
-                          <small class="text-body-secondary">{{ clothe.quantity }} Uds.</small>
-                        </div>
-                      </div>
-                      
                       {% load custom_filters %}
                       <span class="text-body-secondary">{{ clothe.total_price|currency }}</span>
-                    </li>
-                    {%endfor%}
-                    <li class="list-group-item d-flex justify-content-between bg-body-tertiary">
-                      <div class="text-success">
-                        <h6 class="my-0">Código de descuento</h6>
-                        <small>EXAMPLECODE</small>
                       </div>
-                      <span class="text-success">−$5</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between">
-                      <span>Total (COP)</span>
+                  </li>
+                  {% endfor %}
+                  <li class="list-group-item d-flex justify-content-between bg-body-tertiary">
+                    <div class="text-success">
+                        <h6 class="my-0">Costo de envio</h6>
+                        
+                    </div>
+                    <span class="text-success">{{ cost_sent|currency }}</span>
+                </li>
+            
+                  <li class="list-group-item d-flex justify-content-between">
+                      <h6>Total (COP)</h6>
                       {% load custom_filters %}
                       <strong>{{sum_prices|currency}}</strong>
-                    </li>
-                  </ul>
-            
-                  <form class="card p-2">
-                    <div class="input-group">
-                      <input type="text" class="form-control" placeholder="Promo code">
-                      <button type="submit" class="btn btn-secondary">Aplicar</button>
+                  </li>
+              </ul>
+          
+          </div>
+          <div class="col-md-7 col-lg-8 scrollable-column">
+              <h3 class="mb-3">Entrega</h3>
+              <form class="needs-validation" method="POST" action="{% url 'form-payment' %}" novalidate>
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label for="firstName" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="firstName" name="name" required>
+                        <div class="invalid-feedback">Tu nombre es requerido</div>
                     </div>
-                  </form>
+                    <div class="col-sm-6">
+                        <label for="lastName" class="form-label">Apellido</label>
+                        <input type="text" class="form-control" id="lastName" name="lastname" required>
+                        <div class="invalid-feedback">Tu apellido es requerido</div>
+                    </div>
+                    <div class="col-12">
+                        <label for="email" class="form-label">Correo</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                        <div class="invalid-feedback">Escribe un correo válido</div>
+                    </div>
+                    <div class="col-12">
+                        <label for="home" class="form-label">Casa, Apartamento, etc. <span class="text-muted">(Opcional)</span></label>
+                        <input type="text" class="form-control" id="home" name="home">
+                    </div>
+                    <div class="col-12">
+                        <label for="address" class="form-label">Dirección</label>
+                        <input type="text" class="form-control" id="address" name="address" placeholder="cra 20A #23c-45" required>
+                        <div class="invalid-feedback">Por favor ingresa tu dirección</div>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="state" class="form-label">Departamento</label>
+                        <input type="text" class="form-control" id="state" name="stade" placeholder="Departamento de tu municipio" required>
+                        <div class="invalid-feedback">Por favor ingresa tu departamento.</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="city" class="form-label">Ciudad</label>
+                        <input type="text" class="form-control" id="city" name="city" placeholder="Tu ciudad o municipio" required>
+                        <div class="invalid-feedback">Por favor ingresa tu ciudad.</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="zip" class="form-label">Código postal <span class="text-muted">(Opcional)</span></label>
+                        <input type="text" class="form-control" id="zip" name="zip_code">
+                    </div>
+                    <div class="col-12">
+                      <label for="contact" class="form-label">Contacto</label>
+                      <input type="text" class="form-control" id="contact" name="contact" pattern="\d{10}" oninput="this.value=this.value.replace(/[^0-9]/g,'')" required>
+                      <div class="invalid-feedback">Escribe un número válido de 10 dígitos</div>
+                  </div>
+                    <div class="col-12 mt-3">
+                        <div class="card py-0">
+                            <div class="card-body d-flex justify-content-between align-items-center py-2">
+                                <h6 class="card-title mb-0">Costo de envio estandar</h6>
+                                <strong>{{ cost_sent |currency }}</strong>
+                                {% load custom_filters %}
+                                <input type="hidden" name="cost_sent" value="{{ cost_sent }}" readonly class="form-control text-center">
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-7 col-lg-8">
-                  <h4 class="mb-3">Billing address</h4>
-                  <form class="needs-validation" novalidate="">
-                    <div class="row g-3">
-                      <div class="col-sm-6">
-                        <label for="firstName" class="form-label">First name</label>
-                        <input type="text" class="form-control" id="firstName" placeholder="" value="" required="">
-                        <div class="invalid-feedback">
-                          Valid first name is required.
-                        </div>
-                      </div>
-            
-                      <div class="col-sm-6">
-                        <label for="lastName" class="form-label">Last name</label>
-                        <input type="text" class="form-control" id="lastName" placeholder="" value="" required="">
-                        <div class="invalid-feedback">
-                          Valid last name is required.
-                        </div>
-                      </div>
-            
-                      <div class="col-12">
-                        <label for="username" class="form-label">Username</label>
-                        <div class="input-group has-validation">
-                          <span class="input-group-text">@</span>
-                          <input type="text" class="form-control" id="username" placeholder="Username" required="">
-                        <div class="invalid-feedback">
-                            Your username is required.
-                          </div>
-                        </div>
-                      </div>
-            
-                      <div class="col-12">
-                        <label for="email" class="form-label">Email <span class="text-body-secondary">(Optional)</span></label>
-                        <input type="email" class="form-control" id="email" placeholder="you@example.com">
-                        <div class="invalid-feedback">
-                          Please enter a valid email address for shipping updates.
-                        </div>
-                      </div>
-            
-                      <div class="col-12">
-                        <label for="address" class="form-label">Address</label>
-                        <input type="text" class="form-control" id="address" placeholder="1234 Main St" required="">
-                        <div class="invalid-feedback">
-                          Please enter your shipping address.
-                        </div>
-                      </div>
-            
-                      <div class="col-12">
-                        <label for="address2" class="form-label">Address 2 <span class="text-body-secondary">(Optional)</span></label>
-                        <input type="text" class="form-control" id="address2" placeholder="Apartment or suite">
-                      </div>
-            
-                      <div class="col-md-5">
-                        <label for="country" class="form-label">Country</label>
-                        <select class="form-select" id="country" required="">
-                          <option value="">Choose...</option>
-                          <option>United States</option>
-                        </select>
-                        <div class="invalid-feedback">
-                          Please select a valid country.
-                        </div>
-                      </div>
-            
-                      <div class="col-md-4">
-                        <label for="state" class="form-label">State</label>
-                        <select class="form-select" id="state" required="">
-                          <option value="">Choose...</option>
-                          <option>California</option>
-                        </select>
-                        <div class="invalid-feedback">
-                          Please provide a valid state.
-                        </div>
-                      </div>
-            
-                      <div class="col-md-3">
-                        <label for="zip" class="form-label">Zip</label>
-                        <input type="text" class="form-control" id="zip" placeholder="" required="">
-                        <div class="invalid-feedback">
-                          Zip code required.
-                        </div>
-                      </div>
-                    </div>
-            
-                    <hr class="my-4">
-            
-                    <div class="form-check">
-                      <input type="checkbox" class="form-check-input" id="same-address">
-                      <label class="form-check-label" for="same-address">Shipping address is the same as my billing address</label>
-                    </div>
-            
-                    <div class="form-check">
-                      <input type="checkbox" class="form-check-input" id="save-info">
-                      <label class="form-check-label" for="save-info">Save this information for next time</label>
-                    </div>
-            
-                    <hr class="my-4">
-            
-                    <h4 class="mb-3">Payment</h4>
-            
-                    <div class="my-3">
-                      <div class="form-check">
-                        <input id="credit" name="paymentMethod" type="radio" class="form-check-input" checked="" required="">
-                        <label class="form-check-label" for="credit">Credit card</label>
-                      </div>
-                      <div class="form-check">
-                        <input id="debit" name="paymentMethod" type="radio" class="form-check-input" required="">
-                        <label class="form-check-label" for="debit">Debit card</label>
-                      </div>
-                      <div class="form-check">
-                        <input id="paypal" name="paymentMethod" type="radio" class="form-check-input" required="">
-                        <label class="form-check-label" for="paypal">PayPal</label>
-                      </div>
-                    </div>
-            
-                    <div class="row gy-3">
-                      <div class="col-md-6">
-                        <label for="cc-name" class="form-label">Name on card</label>
-                        <input type="text" class="form-control" id="cc-name" placeholder="" required="">
-                        <small class="text-body-secondary">Full name as displayed on card</small>
-                        <div class="invalid-feedback">
-                          Name on card is required
-                        </div>
-                      </div>
-            
-                      <div class="col-md-6">
-                        <label for="cc-number" class="form-label">Credit card number</label>
-                        <input type="text" class="form-control" id="cc-number" placeholder="" required="">
-                        <div class="invalid-feedback">
-                          Credit card number is required
-                        </div>
-                      </div>
-            
-                      <div class="col-md-3">
-                        <label for="cc-expiration" class="form-label">Expiration</label>
-                        <input type="text" class="form-control" id="cc-expiration" placeholder="" required="">
-                        <div class="invalid-feedback">
-                          Expiration date required
-                        </div>
-                      </div>
-            
-                      <div class="col-md-3">
-                        <label for="cc-cvv" class="form-label">CVV</label>
-                        <input type="text" class="form-control" id="cc-cvv" placeholder="" required="">
-                        <div class="invalid-feedback">
-                          Security code required
-                        </div>
-                      </div>
-                    </div>
-            
-                    <hr class="my-4">
-            
-                    <a href="{% url 'form-payment' %}"><button class="w-100 btn btn-primary btn-lg" type="submit">Continue to checkout</button></a>
-                  </form>
+                <div class="mt-3">
+                    <h4 class="card-title">Pagos</h4>
+                    <p>Todas las transacciones son seguras y están encriptadas.</p>
                 </div>
-              </div>
-        </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Métodos de pago disponibles</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6 col-md-4 col-lg-2">
+                                <i class="payment-icon fab fa-cc-visa"></i>
+                                <div class="payment-title">Visa</div>
+                            </div>
+                            <div class="col-6 col-md-4 col-lg-2">
+                                <i class="payment-icon fab fa-cc-mastercard"></i>
+                                <div class="payment-title">Mastercard</div>
+                            </div>
+                            <div class="col-6 col-md-4 col-lg-2">
+                                <i class="payment-icon fab fa-cc-amex"></i>
+                                <div class="payment-title">American Express</div>
+                            </div>
+                            <div class="col-6 col-md-4 col-lg-2">
+                                <img src="https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/6.7.12/mercadopago/logo__large.png" alt="MercadoPago" class="payment-icon img-fluid">
+                                <div class="payment-title">MercadoPago</div>
+                            </div>
+                            <div class="col-6 col-md-4 col-lg-2">
+                                <img src="https://www.pse.com.co/image/layout_icon?img_id=1202326" alt="PSE" class="payment-icon img-fluid">
+                                <div class="payment-title">PSE</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <p class="text-muted mb-0">Luego de hacer clic en “Ir a pagar”, serás redirigido a Checkout Mercado Pago para completar tu compra de forma segura.</p>
+                    </div>
+                </div>
+                <button id="checkout-button" class="w-100 btn btn-primary btn-lg mt-2" type="submit" style="background-color:black;">Ir a pagar</button>
+            </form>
+          </div>
       </div>
-  
+  </div>
 </section>
 
+ <!-- Bootstrap JS and dependencies -->
+ <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+ <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+ <script>
+  function validateForm() {
+      var form = document.querySelector('.needs-validation');
+      if (!form.checkValidity()) {
+          form.classList.add('was-validated');
+          return false;
+      }
+      return true;
+  }
 
+  (function() {
+    'use strict';
 
+    window.addEventListener('load', function() {
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.getElementsByClassName('needs-validation');
+
+        // Loop over them and prevent submission
+        Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+(function() {
+  'use strict';
+
+  window.addEventListener('load', function() {
+      // Fetch all the forms we want to apply custom Bootstrap validation styles to
+      var forms = document.getElementsByClassName('needs-validation');
+
+      // Loop over them and prevent submission
+      Array.prototype.filter.call(forms, function(form) {
+          form.addEventListener('submit', function(event) {
+              // Check if the form is valid
+              if (form.checkValidity() === false) {
+                  event.preventDefault();
+                  event.stopPropagation();
+              }
+
+              // Custom validation for contact field
+              var contactInput = form.querySelector('#contact');
+              var contactValue = contactInput.value;
+              if (!/^\d{10}$/.test(contactValue)) {
+                  contactInput.setCustomValidity('Escribe un número válido de 10 dígitos');
+              } else {
+                  contactInput.setCustomValidity('');
+              }
+
+              form.classList.add('was-validated');
+          }, false);
+      });
+  }, false);
+})();
+</script>
 
 {% endblock %}

@@ -35,7 +35,7 @@ class StartPageView(ListView):
         return context
 
 class AllProducts(View):
-    
+  
     def get(self, request):
 
         filter_session = request.session.get("filters_colors")
@@ -97,7 +97,7 @@ class AllProducts(View):
             'page_obj': page_obj
         }
         return render(request, "clothes/all-products.html", context)
-    
+   
     def post(self, request):
         filter_session = request.session.get("filters_colors")
         price_session = request.session.get("filters_price")
@@ -254,7 +254,7 @@ class ClothesByType(View):
 
 
 class ClothesByGender(View):
-    
+  
     def get(self, request, gender):
 
         filter_session = request.session.get("filters_colors")
@@ -360,7 +360,7 @@ class ClothesByGender(View):
     
 
 class SearhView(View):
-    
+   
     def get(self, request):
 
         query = request.GET.get('q')

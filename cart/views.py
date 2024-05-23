@@ -3,19 +3,25 @@ from django.http import HttpResponseRedirect
 from django.views import View
 from clothes.models import SizeClothes
 from django.contrib import messages
-import requests
+
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from datetime import datetime
+from datetime import datetime, timedelta
+from django.http import JsonResponse, HttpResponse
+import json
+from django.views.decorators.http import require_POST
+import logging
 # SDK de Mercado Pago
 import mercadopago
 # Agrega credenciales
 
 # Create your views here.
-
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 class CartView(View):
 
+    
     def get(self, request):
         stored_clothes = request.session.get("cart_clothes")
         context = {}
@@ -57,6 +63,7 @@ class CartView(View):
            
         return render(request, "cart/my-cart.html", context)
 
+   
     def post(self, request):
 
         stored_clothes = request.session.get("cart_clothes")
@@ -100,7 +107,9 @@ class CartView(View):
             print(stored_clothes)
             # delete a clothe in the cart
             clothe_to_delete = {"id":int(request.POST["sizes_pk"]), "cant":int(request.POST["sizes_cant"])}
+            print(clothe_to_delete)
             stored_clothes.remove(clothe_to_delete)
+            #stored_clothes.clear()
             request.session["cart_clothes"] = stored_clothes
             return HttpResponseRedirect("/cart")
         
@@ -108,11 +117,13 @@ class CartView(View):
         
 
 class CheckOutView(View):
+
     def get(self, request):
 
         stored_clothes = request.session.get("cart_clothes")
         context = {}
         len_cart = len(request.session.get("cart_clothes"))
+        cost_sent = 5000
         
         len_cart = 0
         if request.session.get("cart_clothes") is not None:
@@ -144,14 +155,16 @@ class CheckOutView(View):
                 })
                 index += 1
             
-            sum_prices = sum([item["total_price"] for item in cart])
+            sum_prices = sum([item["total_price"] for item in cart]) + cost_sent
             
             context["carts"] = cart
             context["has_clothes"] = True
             context["number"] = len_cart
             context["sum_prices"] = sum_prices
+            context["cost_sent"] = cost_sent
            
         return render(request, "cart/checkout.html", context)
+    
 
     def post(self, request):
 
@@ -178,111 +191,168 @@ class CheckOutView(View):
                 stored_clothes.append(clothe_choosed)
                 # save it in the session
                 request.session["cart_clothes"] = stored_clothes
+        
+        if "checkout_mercadopago" in request.POST:
+            return HttpResponseRedirect("/cart/payment-methods")
 
         return HttpResponseRedirect("/cart/checkout")
-
-
-def payment(request):
-    """URL="https://api.mercadopago.com/v1/payment_methods"
-    params = {"public_key": "TEST-971dffb2-2411-415d-9981-ded0246e2de0"}
-    response = requests.get(url=URL, params=params)
-    json_response = response.json()
-    for i in json_response:
-        if i["id"] == "pse":
-            print(i["financial_institutions"])"""
     
-    now = datetime.now()
-    print(now)
-    sdk = mercadopago.SDK("TEST-2915852037810033-052022-9ee7aa74c0d6e65734a6f807b28ad266-1820373151")
 
-    # Cria um item na preferência
-    # Crea un ítem en la preferencia
-    preference_data = {
 
+class ReferenceView(View):
+    @csrf_exempt
+    def post(self, request):
+        # Get the id that are in the cart
+        stored_clothes = request.session.get("cart_clothes")
+
+        stored_id = [item["id"] for item in stored_clothes]
+        stored_cant = [item["cant"] for item in stored_clothes]
+        # Get the fields that we need to add in the items references
+        clothes = SizeClothes.objects.filter(id__in=stored_id)
+        index = 0
+        cart = []
+        for clothe in clothes:
+            quantity = stored_cant[index]
+            cart.append({
+            "id": f"Item-ID-{clothe.pk}",
+            "title": clothe.color_clothe.clothes.name,
+            "description": f"Talla {clothe.size} de color {clothe.color_clothe.color}",
+            "unit_price": clothe.color_clothe.clothes.price,
+            "currency_id": "COP",
+            "quantity": quantity,
+          })
+            index += 1
+
+        expiration_date_from = datetime.now()
+        expiration_date_to = expiration_date_from + timedelta(days=3)
       
-        "auto_return": "approved",
+        sdk = mercadopago.SDK("APP_USR-2915852037810033-052120-d6b889c55f57ff26fc0dfbdb6b38dc8e-1820373151")
 
-        "items": [
-            {
-                "id": "item-ID-1234",
-                "title": "Meu produto",
-                "currency_id": "BRL",
-                "picture_url": "https://www.mercadopago.com/org-img/MP3/home/logomp3.gif",
-                "description": "Descrição do Item",
-                "category_id": "art",
-                "quantity": 1,
-                "unit_price": 75
+        # Crea un ítem en la preferencia
+        preference_data = {
+            "auto_return": "approved",
+
+            "items": cart,
+
+            "installments": 1,
+            "default_installments": 1,
+
+            "payer": {
+                "name": request.POST.get("name"),
+                "surname": request.POST.get("lastname"),
+                "email": request.POST.get("email"),
+                "phone": {
+                    "area_code": "57",
+                    "number": request.POST.get("contact")
+                },
+                "address": {
+                    "street_name": request.POST.get("address"),
+                    
+                    "zip_code": request.POST.get("zip_code")
+                }
             },
-            {
-            "title": "Mi producto2",
-            "quantity": 2,
-            "unit_price": 96
+
+            "receiver_address": {
+			"zip_code": request.POST.get("zip_code"),
+			"street_name": request.POST.get("address"),
+			"apartment": request.POST.get("home"),
+		},
+            "back_urls": {
+                "success": "https://644e-2800-e2-2a80-32b-f11c-7962-a44-e570.ngrok-free.app/cart/success",
+                "failure": "https://644e-2800-e2-2a80-32b-f11c-7962-a44-e570.ngrok-free.app/cart/failure",
+                "pending": "https://644e-2800-e2-2a80-32b-f11c-7962-a44-e570.ngrok-free.app/cart/pending"
+            },
+
+             "excluded_payment_methods": [
+                    { "id": "efecty" }
+                ],
+                "excluded_payment_types": [
+                    { "id": "ticket" }
+                ],
+          
+            
+            "binary_mode": True,
+            "shipments":{
+            "cost": int(request.POST.get("cost_sent")),
+            "mode": "not_specified",
+            },
+            "statement_descriptor": "Compra en JOSRAM",
+            "notification_url": f"https://644e-2800-e2-2a80-32b-f11c-7962-a44-e570.ngrok-free.app/cart/notification",
+         
+            "external_reference": "Reference_1234",
+            "expires": True,
+            "expiration_date_from": f"{expiration_date_from.isoformat()}",
+            "expiration_date_to": f"{expiration_date_to.isoformat()}"
         }
-        ],
-
         
-        "installments": 5,
-        "default_installments": 1,
-
-
-        "payer": {
-            "name": "João",
-            "surname": "Silva",
-            "email": "user@email.com",
-            "phone": {
-                "area_code": "11",
-                "number": "4444-4444"
-            },
-            "identification": {
-                "type": "CPF",
-                "number": "19119119100"
-            },
-            "address": {
-                "street_name": "Street",
-                "street_number": 123,
-                "zip_code": "06233200"
-            }
-        },
-        "back_urls": {
-            "success": "https://d672-2800-e2-2a80-32b-29cf-b5a2-7691-f7d.ngrok-free.app/cart/success",
-            "failure": "https://d672-2800-e2-2a80-32b-29cf-b5a2-7691-f7d.ngrok-free.app/cart/failure",
-            "pending": "https://d672-2800-e2-2a80-32b-29cf-b5a2-7691-f7d.ngrok-free.app/cart/pending"
-        },
         
-
-        "shipments":{
-        "cost": 1000,
-        "mode": "not_specified",
-        },
-       
-        "notification_url": "https://d672-2800-e2-2a80-32b-29cf-b5a2-7691-f7d.ngrok-free.app/cart/notificate",
-        "statement_descriptor": "MEUNEGOCIO",
-        "external_reference": "Reference_1234",
-        "expires": True,
-        "expiration_date_from": "2024-05-20T12:00:00.000-04:00",
-        "expiration_date_to": "2024-05-23T12:00:00.000-04:00"
-    }
-
-    preference_response = sdk.preference().create(preference_data)
-    preference = preference_response["response"]
-    print(preference["init_point"])
+        preference_response = sdk.preference().create(preference_data)
+        if preference_response.get("status") != 201:
+            return JsonResponse(preference_response, status=preference_response.get("status", 400))
+        preference = preference_response["response"]
     
-
-    return render(request, "cart/form-payment.html", {
-        "preference": preference
-    })
+        return HttpResponseRedirect(f"{preference['init_point']}")
 
 def success(request):
-    return HttpResponse("<h1>transacion exitosa</h1>")
+    return render(request, "cart/success.html")
 
 def failure(request):
-    return HttpResponse("<h1>transacion fallida</h1>")
+    return render(request, "cart/failure.html")
 
 def supend(request):
-    return HttpResponse("<h1>transacion suspendida</h1>")
+    return render(request, "cart/pending.html")
 
 @csrf_exempt
+@require_POST
 def notificate(request):
-    if request.method == "POST":
-        print("notificar")
-        return HttpResponse("<h1>Notificar</h1>")
+    sdk = mercadopago.SDK("APP_USR-2915852037810033-052120-d6b889c55f57ff26fc0dfbdb6b38dc8e-1820373151")
+    
+    # Extract query parameters
+    topic = request.GET.get("type")
+    data_id = request.GET.get("data.id")
+
+    if not topic or not data_id:
+        return HttpResponse("Invalid request", status=200)
+
+    merchant_order = None
+
+    if topic == "payment":
+        payment_response = sdk.payment().get(data_id)
+        if payment_response["status"] != 200:
+            return HttpResponse("Payment not found", status=200)
+        
+        payment = payment_response["response"]
+        order_id = payment["order"]["id"]
+        merchant_order_response = sdk.merchant_order().get(order_id)
+        
+        if merchant_order_response["status"] != 200:
+            return HttpResponse("Merchant order not found", status=200)
+        
+        merchant_order = merchant_order_response["response"]
+    
+    elif topic == "merchant_order":
+        merchant_order_response = sdk.merchant_order().get(data_id)
+        
+        if merchant_order_response["status"] != 200:
+            return HttpResponse("Merchant order not found", status=200)
+        
+        merchant_order = merchant_order_response["response"]
+       
+    if not merchant_order:
+        return HttpResponse("Merchant order not found", status=200)
+
+    # Calculate paid amount
+    paid_amount = sum(payment['transaction_amount'] for payment in merchant_order["payments"] if payment['status'] == 'approved')
+
+    # Check if the total paid amount covers the order amount
+    if paid_amount >= merchant_order["total_amount"]:
+        if merchant_order.get("shipments") and merchant_order["shipments"][0]["status"] == "ready_to_ship":
+            print("Totally paid. Print the label and release your item.")
+            return HttpResponse("Totally paid. Print the label and release your item.", status=200)
+        
+        else:
+            print("Totally paid. Release your item.")
+            return HttpResponse("Totally paid. Release your item.", status=200)
+    else:
+        print("Not paid yet. Do not release your item.")
+        return HttpResponse("Not paid yet. Do not release your item.", status=200)

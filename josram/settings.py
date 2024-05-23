@@ -28,13 +28,18 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'd672-2800-e2-2a80-32b-29cf-b5a2-7691-f7d.ngrok-free.app'
+    '644e-2800-e2-2a80-32b-f11c-7962-a44-e570.ngrok-free.app'
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://644e-2800-e2-2a80-32b-f11c-7962-a44-e570.ngrok-free.app',  # Replace with your actual Ngrok URL
+    # Add other trusted origins if needed
+]
 
 # Application definition
 
 INSTALLED_APPS = [
+
     'clothes',
     'cart',
     'django.contrib.admin',
@@ -44,6 +49,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

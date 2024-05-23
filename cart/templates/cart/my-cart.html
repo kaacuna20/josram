@@ -63,7 +63,7 @@ Tu carrito - JOSRAM
                                         </td>
                                         <td class="col-md-3 col-sm-6 align-middle">
                                             <div class="p-4 d-flex justify-content-center align-items-center">
-                                                <form method="post" class="d-flex align-items-center">
+                                                <form method="post" class="d-flex align-items-center" action="{% url 'your-cart'%}">
                                                     {% csrf_token %}
                                                     <input type="number" id="cant_product_{{ clothe.size_pk }}" name="cant_product"
                                                            value="{{ clothe.quantity }}" min="1" readonly class="form-control text-center" style="width: 60px;">
