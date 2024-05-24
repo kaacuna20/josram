@@ -336,15 +336,13 @@
                     </p>
                 </div>
 
-                <div class="text-center">
-                    <a href="mailto:kaacuna20@gmail.com">
-                        <button type="button" class="btn btn-outline-primary">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
-                                <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5m-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3"></path>
-                            </svg>
-                            Compartir
-                        </button>
-                    </a>
+                <div class="py-2"> <!-- Adjust padding here -->
+                    <button type="button" class="btn btn-outline-primary" id="shareBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
+                            <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5m-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3"></path>
+                        </svg>
+                        Compartir
+                    </button>
                 </div>
             </div>
         </div>
@@ -393,30 +391,25 @@
                     <div class="accordion-body">
                     <div class="my-3 p-3 bg-body rounded shadow-sm">
                         <h5 class="border-bottom pb-2 mb-2">Reseñas</h5>
-                        {% if comment %}
+                        {% if comments %}
                         {% for comment in comments %}
                         <div class="pb-3 mb-0 small lh-sm border-bottom w-100 mt-2 mb-0 py-0">
                             <div class="row">
-                            <div class="col-lg-1 mx-0 py-0" styles="border: 2px solid black; ">
-                                <p style="font-size: 32px; font-weight: 700; margin-bottom:0px; margin-left: 15px;">
-                                    {{ comment.rating}}.0
-                                    <div style=" float: none;
-
-                                margin-left: auto
-                                
-                                margin-right: auto">{{ comment.get_rating_display}}</div>
-                                </p>
-                                
-                            </div>
-                            <div class="col-lg-9 ">
+                                <div class="col-lg-2 mx-0 py-0 d-flex flex-column align-items-center" >
+                                    <p style="font-size: 32px; font-weight: 700; margin-bottom: 0; margin-left: 15px;" class="align-items-center">
+                                        {{ comment.rating }}.0
+                                        <div >{{ comment.get_rating_display }}</div>
+                                    </p>
+                                </div>
+                            <div class="col-lg-8 ">
                                 <div class="d-flex justify-content-between ">
-                                    <strong class="text-gray-dark mx-2" style="font-size: 20px;">@{{comment.user_name}}</strong>
+                                    <strong class="text-gray-dark mx-0" style="font-size: 20px;">@{{comment.user_name}}</strong>
                                      
                                 </div>
-                                <span class="d-block mt-1 mx-2">{{ comment.comment}}</span>
+                                <span class="d-block mt-1 mx-0">{{ comment.comment}}</span>
                             </div>
                             <div class="col-lg-2">
-                                <div class="d-flex justify-content-between mx-2">
+                                <div class="d-flex justify-content-between mx-3">
                                     <p >{{ comment.date|date:"d/m/Y"}}</p>
                                 </div>
                               
@@ -436,7 +429,7 @@
     </div>
   
 </section>
-
+{% include "clothes/follow.html" %}
 
 
 
@@ -463,9 +456,24 @@
           }
     </script>
 
+    <script>
+        document.getElementById('shareBtn').addEventListener('click', () => {
+            if (navigator.share) {
+                navigator.share({
+                    title: '{{ post.title }}',
+                    url: window.location.href
+                }).then(() => {
+                    console.log('Thanks for sharing!');
+                }).catch(console.error);
+            } else {
+                console.log('Web Share API not supported');
+            }
+        });
+    </script>
+
 <!-- JavaScript para el desplazamiento del carrusel -->
 
-{% include "clothes/follow.html" %}
+
 
 {% endblock %}
 

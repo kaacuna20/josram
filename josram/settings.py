@@ -28,18 +28,18 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    '644e-2800-e2-2a80-32b-f11c-7962-a44-e570.ngrok-free.app'
+    '1816-191-156-249-50.ngrok-free.app'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://644e-2800-e2-2a80-32b-f11c-7962-a44-e570.ngrok-free.app',  # Replace with your actual Ngrok URL
+    'https://1816-191-156-249-50.ngrok-free.app',  # Replace with your actual Ngrok URL
     # Add other trusted origins if needed
 ]
 
 # Application definition
 
 INSTALLED_APPS = [
-
+    'blog',
     'clothes',
     'cart',
     'django.contrib.admin',

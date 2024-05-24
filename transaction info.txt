@@ -1,0 +1,859 @@
+vendedor | TESTUSER912616154 | s73Et5TGvI
+comprador | TESTUSER346738871 | 3N4iJB2iYR
+mastercard | 5120 6944 7061 6271
+visa | 4099 8333 6166 3634
+american | 3743 781877 55283
+
+TARGETA
+-> payment
+{
+  'accounts_info': None,
+  'acquirer_reconciliation': [
+    
+  ],
+  'additional_info': {
+    'authentication_code': None,
+    'available_balance': None,
+    'ip_address': '191.156.42.165',
+    'items': [
+      {
+        'category_id': None,
+        'description': 'Talla S de color azul',
+        'id': 'Item-ID-16',
+        'picture_url': None,
+        'quantity': '1',
+        'title': 'enterizo vital',
+        'unit_price': '30000'
+      }
+    ],
+    'nsu_processadora': None,
+    'payer': {
+      'address': {
+        'street_name': 'cra20A #78c-17'
+      },
+      'first_name': 'Kevin',
+      'last_name': 'Acuña',
+      'phone': {
+        'area_code': '57',
+        'number': '3003443343'
+      }
+    }
+  },
+  'authorization_code': '301299',
+  'binary_mode': True,
+  'brand_id': None,
+  'build_version': '3.52.2',
+  'call_for_authorize_id': None,
+  'captured': True,
+  'card': {
+    'bin': '51206944',
+    'cardholder': {
+      'identification': {
+        'number': '112452312345',
+        'type': 'CC'
+      },
+      'name': 'APRO'
+    },
+    'country': 'COL',
+    'date_created': '2024-05-23T16:45:53.000-04:00',
+    'date_last_updated': '2024-05-23T16:45:53.000-04:00',
+    'expiration_month': 11,
+    'expiration_year': 2025,
+    'first_six_digits': '512069',
+    'id': None,
+    'last_four_digits': '6271',
+    'tags': None
+  },
+  'charges_details': [
+    {
+      'accounts': {
+        'from': 'payer',
+        'to': 'mp'
+      },
+      'amounts': {
+        'original': 5000,
+        'refunded': 0
+      },
+      'client_id': 0,
+      'date_created': '2024-05-23T16:45:52.000-04:00',
+      'id': '78988634850-001',
+      'last_updated': '2024-05-23T16:45:52.000-04:00',
+      'metadata': {
+        
+      },
+      'name': 'shipping_not_specified',
+      'refund_charges': [
+        
+      ],
+      'reserve_id': None,
+      'type': 'shipping'
+    },
+    {
+      'accounts': {
+        'from': 'collector',
+        'to': 'mp'
+      },
+      'amounts': {
+        'original': 2324,
+        'refunded': 0
+      },
+      'client_id': 0,
+      'date_created': '2024-05-23T16:45:53.000-04:00',
+      'id': '78988634850-002',
+      'last_updated': '2024-05-23T16:45:53.000-04:00',
+      'metadata': {
+        
+      },
+      'name': 'mercadopago_fee',
+      'refund_charges': [
+        
+      ],
+      'reserve_id': None,
+      'type': 'fee'
+    }
+  ],
+  'collector_id': 1820373151,
+  'corporation_id': None,
+  'counter_currency': None,
+  'coupon_amount': 0,
+  'currency_id': 'COP',
+  'date_approved': '2024-05-23T16:45:53.000-04:00',
+  'date_created': '2024-05-23T16:45:53.000-04:00',
+  'date_last_updated': '2024-05-23T16:45:55.000-04:00',
+  'date_of_expiration': '2024-05-26T16:45:52.000-04:00',
+  'deduction_schema': None,
+  'description': 'enterizo vital',
+  'differential_pricing_id': None,
+  'external_reference': 'Reference_1234',
+  'fee_details': [
+    {
+      'amount': 2324,
+      'fee_payer': 'collector',
+      'type': 'mercadopago_fee'
+    }
+  ],
+  'financing_group': None,
+  'id': 78988634850,
+  'installments': 1,
+  'integrator_id': None,
+  'issuer_id': '538',
+  'live_mode': True,
+  'marketplace_owner': None,
+  'merchant_account_id': None,
+  'merchant_number': None,
+  'metadata': {
+    
+  },
+  'money_release_date': '2024-05-23T16:45:53.000-04:00',
+  'money_release_schema': None,
+  'money_release_status': 'released',
+  'net_amount': 35000,
+  'notification_url': 'https://1816-191-156-249-50.ngrok-free.app/cart/notification',
+  'operation_type': 'regular_payment',
+  'order': {
+    'id': '18991896926',
+    'type': 'mercadopago'
+  },
+  'payer': {
+    'email': 'test_user_346738871@testuser.com',
+    'entity_type': None,
+    'first_name': None,
+    'id': '1826607084',
+    'identification': {
+      'number': '11111111',
+      'type': 'C.C.'
+    },
+    'last_name': None,
+    'operator_id': None,
+    'phone': {
+      'number': None,
+      'extension': None,
+      'area_code': None
+    },
+    'type': None
+  },
+  'payment_method': {
+    'data': {
+      'routing_data': {
+        'merchant_account_id': '21878194'
+      }
+    },
+    'id': 'master',
+    'issuer_id': '538',
+    'type': 'credit_card'
+  },
+  'payment_method_id': 'master',
+  'payment_type_id': 'credit_card',
+  'platform_id': None,
+  'point_of_interaction': {
+    'business_info': {
+      'branch': 'Merchant Services',
+      'sub_unit': 'checkout_pro',
+      'unit': 'online_payments'
+    },
+    'transaction_data': {
+      'e2e_id': None
+    },
+    'type': 'CHECKOUT'
+  },
+  'pos_id': None,
+  'processing_mode': 'aggregator',
+  'refunds': [
+    
+  ],
+  'shipping_amount': 5000,
+  'sponsor_id': None,
+  'statement_descriptor': 'Mercadopago*fake',
+  'status': 'approved',
+  'status_detail': 'accredited',
+  'store_id': None,
+  'tags': None,
+  'taxes': [
+    {
+      'type': 'IVA',
+      'value': 0
+    }
+  ],
+  'taxes_amount': 0,
+  'transaction_amount': 30000,
+  'transaction_amount_refunded': 0,
+  'transaction_details': {
+    'acquirer_reference': None,
+    'external_resource_url': None,
+    'financial_institution': None,
+    'installment_amount': 35000,
+    'net_received_amount': 32676,
+    'overpaid_amount': 0,
+    'payable_deferral_period': None,
+    'payment_method_reference_id': None,
+    'total_paid_amount': 35000
+  }
+}
+-> merchand_order
+{
+  'id': 18991896926,
+  'status': 'closed',
+  'external_reference': 'Reference_1234',
+  'preference_id': '1820373151-7a1a3e3d-fda6-4737-88d8-7ef2d3e29697',
+  'payments': [
+    {
+      'id': 78988634850,
+      'transaction_amount': 30000,
+      'total_paid_amount': 35000,
+      'shipping_cost': 5000,
+      'currency_id': 'COP',
+      'status': 'approved',
+      'status_detail': 'accredited',
+      'operation_type': 'regular_payment',
+      'date_approved': '2024-05-23T16:45:53.000-04:00',
+      'date_created': '2024-05-23T16:45:53.000-04:00',
+      'last_modified': '2024-05-23T16:45:53.000-04:00',
+      'amount_refunded': 0
+    }
+  ],
+  'shipments': [
+    
+  ],
+  'payouts': [
+    
+  ],
+  'collector': {
+    'id': 1820373151,
+    'email': '',
+    'nickname': 'TESTUSER912616154'
+  },
+  'marketplace': 'NONE',
+  'notification_url': 'https://1816-191-156-249-50.ngrok-free.app/cart/notification',
+  'date_created': '2024-05-23T16:45:52.570-04:00',
+  'last_updated': '2024-05-23T16:45:53.828-04:00',
+  'sponsor_id': None,
+  'shipping_cost': 5000,
+  'total_amount': 30000,
+  'site_id': 'MCO',
+  'paid_amount': 30000,
+  'refunded_amount': 0,
+  'payer': {
+    'id': 1826607084,
+    'email': ''
+  },
+  'items': [
+    {
+      'id': 'Item-ID-16',
+      'category_id': '',
+      'currency_id': 'COP',
+      'description': 'Talla S de color azul',
+      'picture_url': None,
+      'title': 'enterizo vital',
+      'quantity': 1,
+      'unit_price': 30000
+    }
+  ],
+  'cancelled': False,
+  'additional_info': '',
+  'application_id': None,
+  'is_test': False,
+  'order_status': 'paid'
+}
+
+# WALLET MERCADOPAGO
+-> payment
+{
+  'accounts_info': None,
+  'acquirer_reconciliation': [
+    
+  ],
+  'additional_info': {
+    'authentication_code': None,
+    'available_balance': None,
+    'ip_address': '191.156.38.77',
+    'items': [
+      {
+        'category_id': None,
+        'description': 'Talla S de color azul',
+        'id': 'Item-ID-16',
+        'picture_url': None,
+        'quantity': '1',
+        'title': 'enterizo vital',
+        'unit_price': '30000'
+      }
+    ],
+    'nsu_processadora': None,
+    'payer': {
+      'address': {
+        'street_name': 'cra20A #78c-17'
+      },
+      'first_name': 'angela ',
+      'last_name': 'Yu',
+      'phone': {
+        'area_code': '57',
+        'number': '3003443343'
+      }
+    }
+  },
+  'authorization_code': None,
+  'binary_mode': True,
+  'brand_id': None,
+  'build_version': '3.52.2',
+  'call_for_authorize_id': None,
+  'captured': True,
+  'card': {
+    
+  },
+  'charges_details': [
+    {
+      'accounts': {
+        'from': 'payer',
+        'to': 'mp'
+      },
+      'amounts': {
+        'original': 5000,
+        'refunded': 0
+      },
+      'client_id': 0,
+      'date_created': '2024-05-23T18:01:56.000-04:00',
+      'id': '78994800030-001',
+      'last_updated': '2024-05-23T18:01:56.000-04:00',
+      'metadata': {
+        
+      },
+      'name': 'shipping_not_specified',
+      'refund_charges': [
+        
+      ],
+      'reserve_id': None,
+      'type': 'shipping'
+    },
+    {
+      'accounts': {
+        'from': 'collector',
+        'to': 'mp'
+      },
+      'amounts': {
+        'original': 2324,
+        'refunded': 0
+      },
+      'client_id': 0,
+      'date_created': '2024-05-23T18:01:56.000-04:00',
+      'id': '78994800030-002',
+      'last_updated': '2024-05-23T18:01:56.000-04:00',
+      'metadata': {
+        
+      },
+      'name': 'mercadopago_fee',
+      'refund_charges': [
+        
+      ],
+      'reserve_id': None,
+      'type': 'fee'
+    }
+  ],
+  'collector_id': 1820373151,
+  'corporation_id': None,
+  'counter_currency': None,
+  'coupon_amount': 0,
+  'currency_id': 'COP',
+  'date_approved': '2024-05-23T18:01:57.000-04:00',
+  'date_created': '2024-05-23T18:01:56.000-04:00',
+  'date_last_updated': '2024-05-23T18:01:57.000-04:00',
+  'date_of_expiration': '2024-05-26T18:01:56.000-04:00',
+  'deduction_schema': None,
+  'description': 'enterizo vital',
+  'differential_pricing_id': None,
+  'external_reference': 'Reference_1234',
+  'fee_details': [
+    {
+      'amount': 2324,
+      'fee_payer': 'collector',
+      'type': 'mercadopago_fee'
+    }
+  ],
+  'financing_group': None,
+  'id': 78994800030,
+  'installments': 1,
+  'integrator_id': None,
+  'issuer_id': '2013',
+  'live_mode': True,
+  'marketplace_owner': None,
+  'merchant_account_id': None,
+  'merchant_number': None,
+  'metadata': {
+    
+  },
+  'money_release_date': '2024-05-23T18:01:57.000-04:00',
+  'money_release_schema': None,
+  'money_release_status': 'released',
+  'net_amount': 35000,
+  'notification_url': 'https://1816-191-156-249-50.ngrok-free.app/cart/notification',
+  'operation_type': 'regular_payment',
+  'order': {
+    'id': '18995081134',
+    'type': 'mercadopago'
+  },
+  'payer': {
+    'email': 'test_user_394164502@testuser.com',
+    'entity_type': None,
+    'first_name': None,
+    'id': '1827604872',
+    'identification': {
+      'number': '11111111',
+      'type': 'C.C.'
+    },
+    'last_name': None,
+    'operator_id': None,
+    'phone': {
+      'number': None,
+      'extension': None,
+      'area_code': None
+    },
+    'type': None
+  },
+  'payment_method': {
+    'id': 'account_money',
+    'issuer_id': '2013',
+    'type': 'account_money'
+  },
+  'payment_method_id': 'account_money',
+  'payment_type_id': 'account_money',
+  'platform_id': None,
+  'point_of_interaction': {
+    'business_info': {
+      'branch': 'Merchant Services',
+      'sub_unit': 'checkout_pro',
+      'unit': 'online_payments'
+    },
+    'transaction_data': {
+      'e2e_id': None
+    },
+    'type': 'CHECKOUT'
+  },
+  'pos_id': None,
+  'processing_mode': 'aggregator',
+  'refunds': [
+    
+  ],
+  'shipping_amount': 5000,
+  'sponsor_id': None,
+  'statement_descriptor': None,
+  'status': 'approved',
+  'status_detail': 'accredited',
+  'store_id': None,
+  'tags': None,
+  'taxes': [
+    {
+      'type': 'IVA',
+      'value': None
+    }
+  ],
+  'taxes_amount': 0,
+  'transaction_amount': 30000,
+  'transaction_amount_refunded': 0,
+  'transaction_details': {
+    'acquirer_reference': None,
+    'external_resource_url': None,
+    'financial_institution': None,
+    'installment_amount': 0,
+    'net_received_amount': 32676,
+    'overpaid_amount': 0,
+    'payable_deferral_period': None,
+    'payment_method_reference_id': None,
+    'total_paid_amount': 35000
+  }
+}
+
+
+-> merchand_order
+{
+  'id': 18995081134,
+  'status': 'closed',
+  'external_reference': 'Reference_1234',
+  'preference_id': '1820373151-e93c9782-d0c1-4701-bf1d-3bb0e1da163b',
+  'payments': [
+    {
+      'id': 78994800030,
+      'transaction_amount': 30000,
+      'total_paid_amount': 35000,
+      'shipping_cost': 5000,
+      'currency_id': 'COP',
+      'status': 'approved',
+      'status_detail': 'accredited',
+      'operation_type': 'regular_payment',
+      'date_approved': '2024-05-23T18:01:57.000-04:00',
+      'date_created': '2024-05-23T18:01:56.000-04:00',
+      'last_modified': '2024-05-23T18:01:57.000-04:00',
+      'amount_refunded': 0
+    }
+  ],
+  'shipments': [
+    
+  ],
+  'payouts': [
+    
+  ],
+  'collector': {
+    'id': 1820373151,
+    'email': '',
+    'nickname': 'TESTUSER912616154'
+  },
+  'marketplace': 'NONE',
+  'notification_url': 'https://1816-191-156-249-50.ngrok-free.app/cart/notification',
+  'date_created': '2024-05-23T18:01:56.330-04:00',
+  'last_updated': '2024-05-23T18:01:57.381-04:00',
+  'sponsor_id': None,
+  'shipping_cost': 5000,
+  'total_amount': 30000,
+  'site_id': 'MCO',
+  'paid_amount': 30000,
+  'refunded_amount': 0,
+  'payer': {
+    'id': 1827604872,
+    'email': ''
+  },
+  'items': [
+    {
+      'id': 'Item-ID-16',
+      'category_id': '',
+      'currency_id': 'COP',
+      'description': 'Talla S de color azul',
+      'picture_url': None,
+      'title': 'enterizo vital',
+      'quantity': 1,
+      'unit_price': 30000
+    }
+  ],
+  'cancelled': False,
+  'additional_info': '',
+  'application_id': None,
+  'is_test': False,
+  'order_status': 'paid'
+}
+
+#TRANSACTION FAILURE
+-> merchand_order
+
+{
+  'id': 18987472573,
+  'status': 'opened',
+  'external_reference': 'Reference_1234',
+  'preference_id': '1820373151-0f9cb00c-72f2-416a-9f99-48a3feb1973f',
+  'payments': [
+    {
+      'id': 78995833534,
+      'transaction_amount': 30000,
+      'total_paid_amount': 35000,
+      'shipping_cost': 5000,
+      'currency_id': 'COP',
+      'status': 'rejected',
+      'status_detail': 'cc_rejected_other_reason',
+      'operation_type': 'regular_payment',
+      'date_approved': '0001-01-01T00:00:00.000+00:00',
+      'date_created': '2024-05-23T18:14:16.000-04:00',
+      'last_modified': '2024-05-23T18:14:17.000-04:00',
+      'amount_refunded': 0
+    }
+  ],
+  'shipments': [
+    
+  ],
+  'payouts': [
+    
+  ],
+  'collector': {
+    'id': 1820373151,
+    'email': '',
+    'nickname': 'TESTUSER912616154'
+  },
+  'marketplace': 'NONE',
+  'notification_url': 'https://1816-191-156-249-50.ngrok-free.app/cart/notification',
+  'date_created': '2024-05-23T18:14:16.468-04:00',
+  'last_updated': '2024-05-23T18:14:18.074-04:00',
+  'sponsor_id': None,
+  'shipping_cost': 0,
+  'total_amount': 30000,
+  'site_id': 'MCO',
+  'paid_amount': 0,
+  'refunded_amount': 0,
+  'payer': {
+    'id': 1827604872,
+    'email': ''
+  },
+  'items': [
+    {
+      'id': 'Item-ID-16',
+      'category_id': '',
+      'currency_id': 'COP',
+      'description': 'Talla S de color azul',
+      'picture_url': None,
+      'title': 'enterizo vital',
+      'quantity': 1,
+      'unit_price': 30000
+    }
+  ],
+  'cancelled': False,
+  'additional_info': '',
+  'application_id': None,
+  'is_test': False,
+  'order_status': 'payment_required'
+}
+
+-> payment
+
+{
+  'accounts_info': None,
+  'acquirer_reconciliation': [
+    
+  ],
+  'additional_info': {
+    'authentication_code': None,
+    'available_balance': None,
+    'ip_address': '191.156.33.9',
+    'items': [
+      {
+        'category_id': None,
+        'description': 'Talla S de color azul',
+        'id': 'Item-ID-16',
+        'picture_url': None,
+        'quantity': '1',
+        'title': 'enterizo vital',
+        'unit_price': '30000'
+      }
+    ],
+    'nsu_processadora': None,
+    'payer': {
+      'address': {
+        'street_name': 'cra20A #78c-17'
+      },
+      'first_name': 'angela ',
+      'last_name': 'Yu',
+      'phone': {
+        'area_code': '57',
+        'number': '3003443343'
+      }
+    }
+  },
+  'authorization_code': '000000',
+  'binary_mode': True,
+  'brand_id': None,
+  'build_version': '3.52.2',
+  'call_for_authorize_id': None,
+  'captured': True,
+  'card': {
+    'bin': None,
+    'cardholder': {
+      'identification': {
+        'number': None,
+        'type': None
+      },
+      'name': None
+    },
+    'country': None,
+    'date_created': None,
+    'date_last_updated': None,
+    'expiration_month': None,
+    'expiration_year': None,
+    'first_six_digits': None,
+    'id': None,
+    'last_four_digits': '5283',
+    'tags': None
+  },
+  'charges_details': [
+    {
+      'accounts': {
+        'from': 'payer',
+        'to': 'mp'
+      },
+      'amounts': {
+        'original': 5000,
+        'refunded': 0
+      },
+      'client_id': 0,
+      'date_created': '2024-05-23T18:14:16.000-04:00',
+      'id': '78995833534-001',
+      'last_updated': '2024-05-23T18:14:16.000-04:00',
+      'metadata': {
+        
+      },
+      'name': 'shipping_not_specified',
+      'refund_charges': [
+        
+      ],
+      'reserve_id': None,
+      'type': 'shipping'
+    },
+    {
+      'accounts': {
+        'from': 'collector',
+        'to': 'mp'
+      },
+      'amounts': {
+        'original': 2324,
+        'refunded': 0
+      },
+      'client_id': 0,
+      'date_created': '2024-05-23T18:14:16.000-04:00',
+      'id': '78995833534-002',
+      'last_updated': '2024-05-23T18:14:16.000-04:00',
+      'metadata': {
+        
+      },
+      'name': 'mercadopago_fee',
+      'refund_charges': [
+        
+      ],
+      'reserve_id': None,
+      'type': 'fee'
+    }
+  ],
+  'collector_id': 1820373151,
+  'corporation_id': None,
+  'counter_currency': None,
+  'coupon_amount': 0,
+  'currency_id': 'COP',
+  'date_approved': None,
+  'date_created': '2024-05-23T18:14:16.000-04:00',
+  'date_last_updated': '2024-05-23T18:14:17.000-04:00',
+  'date_of_expiration': '2024-05-26T18:14:16.000-04:00',
+  'deduction_schema': None,
+  'description': 'enterizo vital',
+  'differential_pricing_id': None,
+  'external_reference': 'Reference_1234',
+  'fee_details': [
+    
+  ],
+  'financing_group': None,
+  'id': 78995833534,
+  'installments': 1,
+  'integrator_id': None,
+  'issuer_id': '202',
+  'live_mode': True,
+  'marketplace_owner': None,
+  'merchant_account_id': None,
+  'merchant_number': None,
+  'metadata': {
+    
+  },
+  'money_release_date': None,
+  'money_release_schema': None,
+  'money_release_status': 'released',
+  'net_amount': 35000,
+  'notification_url': 'https://1816-191-156-249-50.ngrok-free.app/cart/notification',
+  'operation_type': 'regular_payment',
+  'order': {
+    'id': '18987472573',
+    'type': 'mercadopago'
+  },
+  'payer': {
+    'email': None,
+    'entity_type': None,
+    'first_name': None,
+    'id': '1827604872',
+    'identification': {
+      'number': None,
+      'type': None
+    },
+    'last_name': None,
+    'operator_id': None,
+    'phone': {
+      'number': None,
+      'extension': None,
+      'area_code': None
+    },
+    'type': None
+  },
+  'payment_method': {
+    'data': {
+      'retried_by': 'rejection',
+      'routing_data': {
+        'merchant_account_id': '19840792'
+      }
+    },
+    'id': 'amex',
+    'issuer_id': '202',
+    'type': 'credit_card'
+  },
+  'payment_method_id': 'amex',
+  'payment_type_id': 'credit_card',
+  'platform_id': None,
+  'point_of_interaction': {
+    'business_info': {
+      'branch': 'Merchant Services',
+      'sub_unit': 'checkout_pro',
+      'unit': 'online_payments'
+    },
+    'transaction_data': {
+      'e2e_id': None
+    },
+    'type': 'CHECKOUT'
+  },
+  'pos_id': None,
+  'processing_mode': 'aggregator',
+  'refunds': [
+    
+  ],
+  'shipping_amount': 5000,
+  'sponsor_id': None,
+  'statement_descriptor': 'Mercadopago*fake',
+  'status': 'rejected',
+  'status_detail': 'cc_rejected_other_reason',
+  'store_id': None,
+  'tags': None,
+  'taxes': [
+    {
+      'type': 'IVA',
+      'value': 0
+    }
+  ],
+  'taxes_amount': 0,
+  'transaction_amount': 30000,
+  'transaction_amount_refunded': 0,
+  'transaction_details': {
+    'acquirer_reference': None,
+    'external_resource_url': None,
+    'financial_institution': None,
+    'installment_amount': 35000,
+    'net_received_amount': 0,
+    'overpaid_amount': 0,
+    'payable_deferral_period': None,
+    'payment_method_reference_id': None,
+    'total_paid_amount': 35000
+  }
+}

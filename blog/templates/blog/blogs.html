@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Blog - JOSRAM
+{% endblock %}
+
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static "cart/all-products.css" %}"/>
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    .bg-section {
+        position: relative;
+        background: url('{% static 'blog/images/blog_bg.png'%}') no-repeat center center;
+        background-size: cover;
+        color: white;
+        padding: 5rem 1rem;
+      }
+  
+      .bg-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5); /* Optional: Add a dark overlay for better text readability */
+        z-index: 1;
+      }
+  
+      .bg-section .content {
+        position: relative;
+        z-index: 2;
+      }
+      .text-white {
+        color: white !important;
+      }
+</style>
+{% include "cart/includes/style.html" %}
+{% endblock %}
+
+
+{% block content %}
+
+<main>
+
+    <section class="bg-section text-center container">
+        <div class="row py-lg-5 content">
+          <div class="col-lg-6 col-md-8 mx-auto">
+            <h1 class="fw-light">Espacio de la salud</h1>
+            <p class="lead text-white">Dedicarle tiempo a tu salud es fundamental para tu conexión mente-cuerpo, y eso incluye más que hacer deporte.</p>
+        </div>
+        </div>
+      </section>
+  
+      <div class="album py-5 bg-body-tertiary">
+        <div class="container">
+          <div class="container my-4">
+
+            <div class="row align-items-center mb-4">
+              <div class="col">
+                <h3 class="text-center">Salud y bienestar</h3>
+              </div>
+            </div>
+            
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                {% for post in page_obj %}
+              <div class="col d-flex justify-content-center">
+                <div class="card d-flex flex-column align-items-center" style="width: 18rem;">
+                    <a href="{% url 'post-detail-page' post.slug %}"><img src="{{ post.image.url}}" alt="{{post.title}}"  height="200px" width="100%">
+                  <div class="card-body text-center">
+                    <h5 class="card-title">{{post.title|title}}</h5></a>
+                    <p class="card-text">{{post.excerpt}}</p>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+  
+  </main>
+
+  <section id="pagination">
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page=1" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+        </li>
+        {% endif %}
+
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.number }}">{{ page_obj.number }}</a>
+        </li>
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </section>
+{% endblock %}

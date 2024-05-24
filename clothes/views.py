@@ -9,6 +9,7 @@ from .forms import ClotheForm, CommentForm, PriceForm
 from django.urls import reverse
 from django.core.paginator import Paginator
 from django.db.models import Q
+from blog.models import Post
 
 # Create your views here.
 

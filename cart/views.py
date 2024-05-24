@@ -177,20 +177,15 @@ class CheckOutView(View):
             sizes_clothes_id = int(request.POST["sizes_clothes_pk"])
             quantity = int(request.POST["sizes_clothes_cant"])
 
-            if len(stored_clothes) == 0:
-                clothe_choosed = {"id":sizes_clothes_id, "cant":quantity}
-                # add the tuple in the list stored_clothe
-                stored_clothes.append(clothe_choosed)
-                # save it in the session
-                request.session["cart_clothes"] = stored_clothes
-
-            elif len(stored_clothes) >= 1:
+            if len(stored_clothes) >= 1:
+                # clean the cart
                 stored_clothes.clear()
-                clothe_choosed = {"id":sizes_clothes_id, "cant":quantity}
-                # add the tuple in the list stored_clothe
-                stored_clothes.append(clothe_choosed)
-                # save it in the session
-                request.session["cart_clothes"] = stored_clothes
+
+            clothe_choosed = {"id":sizes_clothes_id, "cant":quantity}
+            # add the tuple in the list stored_clothe
+            stored_clothes.append(clothe_choosed)
+            # save it in the session
+            request.session["cart_clothes"] = stored_clothes
         
         if "checkout_mercadopago" in request.POST:
             return HttpResponseRedirect("/cart/payment-methods")
@@ -258,9 +253,9 @@ class ReferenceView(View):
 			"apartment": request.POST.get("home"),
 		},
             "back_urls": {
-                "success": "https://644e-2800-e2-2a80-32b-f11c-7962-a44-e570.ngrok-free.app/cart/success",
-                "failure": "https://644e-2800-e2-2a80-32b-f11c-7962-a44-e570.ngrok-free.app/cart/failure",
-                "pending": "https://644e-2800-e2-2a80-32b-f11c-7962-a44-e570.ngrok-free.app/cart/pending"
+                "success": "https://1816-191-156-249-50.ngrok-free.app/cart/success",
+                "failure": "https://1816-191-156-249-50.ngrok-free.app/cart/failure",
+                "pending": "https://1816-191-156-249-50.ngrok-free.app/cart/pending"
             },
 
              "excluded_payment_methods": [
@@ -277,14 +272,13 @@ class ReferenceView(View):
             "mode": "not_specified",
             },
             "statement_descriptor": "Compra en JOSRAM",
-            "notification_url": f"https://644e-2800-e2-2a80-32b-f11c-7962-a44-e570.ngrok-free.app/cart/notification",
+            "notification_url": f"https://1816-191-156-249-50.ngrok-free.app/cart/notification",
          
             "external_reference": "Reference_1234",
             "expires": True,
             "expiration_date_from": f"{expiration_date_from.isoformat()}",
             "expiration_date_to": f"{expiration_date_to.isoformat()}"
         }
-        
         
         preference_response = sdk.preference().create(preference_data)
         if preference_response.get("status") != 201:
@@ -312,6 +306,7 @@ def notificate(request):
     data_id = request.GET.get("data.id")
 
     if not topic or not data_id:
+        print("Invalid request")
         return HttpResponse("Invalid request", status=200)
 
     merchant_order = None
@@ -319,6 +314,7 @@ def notificate(request):
     if topic == "payment":
         payment_response = sdk.payment().get(data_id)
         if payment_response["status"] != 200:
+            print("Payment not found")
             return HttpResponse("Payment not found", status=200)
         
         payment = payment_response["response"]
@@ -326,6 +322,7 @@ def notificate(request):
         merchant_order_response = sdk.merchant_order().get(order_id)
         
         if merchant_order_response["status"] != 200:
+            print("Merchant order not found")
             return HttpResponse("Merchant order not found", status=200)
         
         merchant_order = merchant_order_response["response"]
@@ -334,11 +331,13 @@ def notificate(request):
         merchant_order_response = sdk.merchant_order().get(data_id)
         
         if merchant_order_response["status"] != 200:
+            print("Merchant order not found")
             return HttpResponse("Merchant order not found", status=200)
         
         merchant_order = merchant_order_response["response"]
        
     if not merchant_order:
+        print("Merchant order not found")
         return HttpResponse("Merchant order not found", status=200)
 
     # Calculate paid amount
@@ -348,11 +347,17 @@ def notificate(request):
     if paid_amount >= merchant_order["total_amount"]:
         if merchant_order.get("shipments") and merchant_order["shipments"][0]["status"] == "ready_to_ship":
             print("Totally paid. Print the label and release your item.")
+            print(f"payment: {payment}" )
+            print(f"merchant_order: {merchant_order}" )
             return HttpResponse("Totally paid. Print the label and release your item.", status=200)
         
         else:
             print("Totally paid. Release your item.")
+            print(f"payment: {payment}" )
+            print(f"merchant_order: {merchant_order}" )
             return HttpResponse("Totally paid. Release your item.", status=200)
     else:
         print("Not paid yet. Do not release your item.")
+        print(f"payment: {payment}" )
+        print(f"merchant_order: {merchant_order}" )
         return HttpResponse("Not paid yet. Do not release your item.", status=200)

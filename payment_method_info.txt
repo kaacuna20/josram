@@ -1,0 +1,462 @@
+[
+    {
+        "id": "master",
+        "name": "Mastercard",
+        "payment_type_id": "credit_card",
+        "status": "active",
+        "secure_thumbnail": "https://www.mercadopago.com/org-img/MP3/API/logos/master.gif",
+        "thumbnail": "http://img.mlstatic.com/org-img/MP3/API/logos/master.gif",
+        "deferred_capture": "unsupported",
+        "settings": [
+            {
+                "card_number": {
+                    "validation": "standard",
+                    "length": 16
+                },
+                "bin": {
+                    "pattern": "^(5|(2(221|222|223|224|225|226|227|228|229|23|24|25|26|27|28|29|3|4|5|6|70|71|720)))",
+                    "installments_pattern": "^(5|(2(221|222|223|224|225|226|227|228|229|23|24|25|26|27|28|29|3|4|5|6|70|71|720)))",
+                    "exclusion_pattern": "^(590712|533254|534778|557555|525315|537980|523719|559749|530715|530716|530717|530710|530721|514332|529768|536782|552558|530729|530712|530724|530727|530695|510342|530719|530713|530720|530725|530726|530691|530711|530728|530714|530723|528633|524627|530718|530722|536126|518503|548185|525358|545409|535803|547692|520922|517404|516451|518092|517393|544039|526557|590309|512827|589518|589514|529448|527558|244004|241000|223108|556831|516282|554603|571839|511614|524052)"
+                },
+                "security_code": {
+                    "length": 3,
+                    "card_location": "back",
+                    "mode": "mandatory"
+                }
+            }
+        ],
+        "additional_info_needed": [
+            "cardholder_identification_number",
+            "cardholder_identification_type",
+            "cardholder_name"
+        ],
+        "min_allowed_amount": 1000,
+        "max_allowed_amount": 50000000,
+        "accreditation_time": 2880,
+        "financial_institutions": [],
+        "processing_modes": [
+            "aggregator"
+        ]
+    },
+    {
+        "id": "diners",
+        "name": "Diners",
+        "payment_type_id": "credit_card",
+        "status": "active",
+        "secure_thumbnail": "https://www.mercadopago.com/org-img/MP3/API/logos/diners.gif",
+        "thumbnail": "http://img.mlstatic.com/org-img/MP3/API/logos/diners.gif",
+        "deferred_capture": "unsupported",
+        "settings": [
+            {
+                "card_number": {
+                    "validation": "standard",
+                    "length": 14
+                },
+                "bin": {
+                    "pattern": "^((30)|(36)|(38))",
+                    "installments_pattern": "^((30)|(36)|(38))",
+                    "exclusion_pattern": null
+                },
+                "security_code": {
+                    "length": 3,
+                    "card_location": "back",
+                    "mode": "mandatory"
+                }
+            }
+        ],
+        "additional_info_needed": [
+            "cardholder_identification_number",
+            "cardholder_identification_type",
+            "cardholder_name"
+        ],
+        "min_allowed_amount": 1000,
+        "max_allowed_amount": 50000000,
+        "accreditation_time": 2880,
+        "financial_institutions": [],
+        "processing_modes": [
+            "aggregator"
+        ]
+    },
+    {
+        "id": "visa",
+        "name": "Visa",
+        "payment_type_id": "credit_card",
+        "status": "active",
+        "secure_thumbnail": "https://www.mercadopago.com/org-img/MP3/API/logos/visa.gif",
+        "thumbnail": "https://www.mercadopago.com/org-img/MP3/API/logos/visa.gif",
+        "deferred_capture": "supported",
+        "settings": [
+            {
+                "card_number": {
+                    "validation": "standard",
+                    "length": 16
+                },
+                "bin": {
+                    "pattern": "^(4)",
+                    "installments_pattern": "^(4)",
+                    "exclusion_pattern": "^(488233|462896|484192|441509|486367|431385|454106|489635|455982|498476|492468|491268|459317|418253|404279|423949|457605|402739|450942|457604|457603|491511|449744|453924|498534|489445|486647|481550|409355|482407|490109|477170|462940|483864|457316)"
+                },
+                "security_code": {
+                    "length": 3,
+                    "card_location": "back",
+                    "mode": "mandatory"
+                }
+            }
+        ],
+        "additional_info_needed": [
+            "cardholder_identification_number",
+            "cardholder_identification_type",
+            "cardholder_name"
+        ],
+        "min_allowed_amount": 1600,
+        "max_allowed_amount": 30000000,
+        "accreditation_time": 2880,
+        "financial_institutions": [],
+        "processing_modes": [
+            "aggregator"
+        ]
+    },
+    {
+        "id": "amex",
+        "name": "American Express",
+        "payment_type_id": "credit_card",
+        "status": "active",
+        "secure_thumbnail": "https://www.mercadopago.com/org-img/MP3/API/logos/amex.gif",
+        "thumbnail": "http://img.mlstatic.com/org-img/MP3/API/logos/amex.gif",
+        "deferred_capture": "unsupported",
+        "settings": [
+            {
+                "card_number": {
+                    "validation": "standard",
+                    "length": 15
+                },
+                "bin": {
+                    "pattern": "^(34|37)",
+                    "installments_pattern": "^(34|37)",
+                    "exclusion_pattern": "^(377548|379352)"
+                },
+                "security_code": {
+                    "length": 4,
+                    "card_location": "front",
+                    "mode": "mandatory"
+                }
+            }
+        ],
+        "additional_info_needed": [
+            "cardholder_identification_number",
+            "cardholder_identification_type",
+            "cardholder_name"
+        ],
+        "min_allowed_amount": 1000,
+        "max_allowed_amount": 50000000,
+        "accreditation_time": 2880,
+        "financial_institutions": [],
+        "processing_modes": [
+            "aggregator"
+        ]
+    },
+    {
+        "id": "efecty",
+        "name": "Efecty",
+        "payment_type_id": "ticket",
+        "status": "active",
+        "secure_thumbnail": "https://http2.mlstatic.com/storage/logos-api-admin/e5ee1d00-f39b-11eb-8e0d-6f4af49bf82e-l.png",
+        "thumbnail": "https://http2.mlstatic.com/storage/logos-api-admin/e5ee1d00-f39b-11eb-8e0d-6f4af49bf82e-l.png",
+        "deferred_capture": "does_not_apply",
+        "settings": [],
+        "additional_info_needed": [],
+        "min_allowed_amount": 5000,
+        "max_allowed_amount": 8000000,
+        "accreditation_time": 0,
+        "financial_institutions": [],
+        "processing_modes": [
+            "aggregator"
+        ]
+    },
+    {
+        "id": "codensa",
+        "name": "Crédito Fácil Codensa",
+        "payment_type_id": "credit_card",
+        "status": "active",
+        "secure_thumbnail": "https://www.mercadopago.com/org-img/MP3/API/logos/codensa.gif",
+        "thumbnail": "http://img.mlstatic.com/org-img/MP3/API/logos/codensa.gif",
+        "deferred_capture": "unsupported",
+        "settings": [
+            {
+                "card_number": {
+                    "validation": "standard",
+                    "length": 16
+                },
+                "bin": {
+                    "pattern": "^(590712)",
+                    "installments_pattern": "^(590712)",
+                    "exclusion_pattern": null
+                },
+                "security_code": {
+                    "length": 3,
+                    "card_location": "back",
+                    "mode": "mandatory"
+                }
+            }
+        ],
+        "additional_info_needed": [
+            "cardholder_identification_number",
+            "cardholder_identification_type",
+            "cardholder_name"
+        ],
+        "min_allowed_amount": 100,
+        "max_allowed_amount": 5000000,
+        "accreditation_time": 0,
+        "financial_institutions": [],
+        "processing_modes": [
+            "aggregator"
+        ]
+    },
+    {
+        "id": "debvisa",
+        "name": "Visa Débito",
+        "payment_type_id": "debit_card",
+        "status": "active",
+        "secure_thumbnail": "https://www.mercadopago.com/org-img/MP3/API/logos/debvisa.gif",
+        "thumbnail": "https://www.mercadopago.com/org-img/MP3/API/logos/debvisa.gif",
+        "deferred_capture": "unsupported",
+        "settings": [
+            {
+                "card_number": {
+                    "validation": "standard",
+                    "length": 16
+                },
+                "bin": {
+                    "pattern": "^(402739|404279|409355|418253|419819|423949|431385|441509|450942|454106|455982|457603|457604|457605|459317|462896|462940|474553|477170|481550|482407|484192|486367|488233|490109|491268|491511|492468|498476|457316)",
+                    "installments_pattern": "",
+                    "exclusion_pattern": null
+                },
+                "security_code": {
+                    "length": 3,
+                    "card_location": "back",
+                    "mode": "mandatory"
+                }
+            }
+        ],
+        "additional_info_needed": [
+            "cardholder_identification_number",
+            "cardholder_identification_type",
+            "cardholder_name"
+        ],
+        "min_allowed_amount": 1000,
+        "max_allowed_amount": 50000000,
+        "accreditation_time": 0,
+        "financial_institutions": [],
+        "processing_modes": [
+            "aggregator"
+        ]
+    },
+    {
+        "id": "debmaster",
+        "name": "Mastercard Débito",
+        "payment_type_id": "debit_card",
+        "status": "active",
+        "secure_thumbnail": "https://www.mercadopago.com/org-img/MP3/API/logos/debmaster.gif",
+        "thumbnail": "https://www.mercadopago.com/org-img/MP3/API/logos/debmaster.gif",
+        "deferred_capture": "unsupported",
+        "settings": [
+            {
+                "card_number": {
+                    "validation": "standard",
+                    "length": 16
+                },
+                "bin": {
+                    "pattern": "^(533254|534778|557555|525315|537980|523719|559749|530715|530716|530717|530710|530721|514332|529768|536782|552558|530729|530712|530724|530727|530695|510342|530719|530713|530720|530725|530726|530711|530728|530714|530723|528633|524627|530718|530722|536126|518503|548185|525358|545409|535803|547692|520922|517404|516451|518092|517393|544039|526557|589514|527558|67903180|244004|241000|223108|530691|581682|516282|556831)",
+                    "installments_pattern": null,
+                    "exclusion_pattern": null
+                },
+                "security_code": {
+                    "length": 3,
+                    "card_location": "back",
+                    "mode": "mandatory"
+                }
+            }
+        ],
+        "additional_info_needed": [
+            "cardholder_identification_number",
+            "cardholder_identification_type",
+            "cardholder_name"
+        ],
+        "min_allowed_amount": 1000,
+        "max_allowed_amount": 50000000,
+        "accreditation_time": 0,
+        "financial_institutions": [],
+        "processing_modes": [
+            "aggregator"
+        ]
+    },
+    {
+        "id": "pse",
+        "name": "PSE",
+        "payment_type_id": "bank_transfer",
+        "status": "active",
+        "secure_thumbnail": "https://www.mercadopago.com/org-img/MP3/API/logos/pse.gif",
+        "thumbnail": "https://www.mercadopago.com/org-img/MP3/API/logos/pse.gif",
+        "deferred_capture": "does_not_apply",
+        "settings": [],
+        "additional_info_needed": [
+            "entity_type"
+        ],
+        "min_allowed_amount": 1600,
+        "max_allowed_amount": 340000000,
+        "accreditation_time": 30,
+        "financial_institutions": [
+            {
+                "id": "1019",
+                "description": "Scotiabank Colpatria"
+            },
+            {
+                "id": "1065",
+                "description": "Santander"
+            },
+            {
+                "id": "1811",
+                "description": "Rappipay"
+            },
+            {
+                "id": "1507",
+                "description": "Nequi"
+            },
+            {
+                "id": "1801",
+                "description": "MOVii"
+            },
+            {
+                "id": "1070",
+                "description": "Lulo Bank"
+            },
+            {
+                "id": "1071",
+                "description": "J.P. Morgan"
+            },
+            {
+                "id": "1637",
+                "description": "FINANCIERA DANN REGIONAL - IRIS"
+            },
+            {
+                "id": "1051",
+                "description": "Davivienda"
+            },
+            {
+                "id": "1551",
+                "description": "DaviPlata"
+            },
+            {
+                "id": "1097",
+                "description": "dale!"
+            },
+            {
+                "id": "1289",
+                "description": "Cotrafa"
+            },
+            {
+                "id": "1292",
+                "description": "Confiar Cooperativa Financiera"
+            },
+            {
+                "id": "1370",
+                "description": "Coltefinanciera"
+            },
+            {
+                "id": "1009",
+                "description": "Citibank"
+            },
+            {
+                "id": "1283",
+                "description": "CFA Cooperativa Financiera"
+            },
+            {
+                "id": "1013",
+                "description": "BBVA"
+            },
+            {
+                "id": "1061",
+                "description": "Bancoomeva"
+            },
+            {
+                "id": "1007",
+                "description": "Bancolombia"
+            },
+            {
+                "id": "1303",
+                "description": "Banco Unión"
+            },
+            {
+                "id": "1069",
+                "description": "Banco Serfinanza"
+            },
+            {
+                "id": "1002",
+                "description": "Banco Popular"
+            },
+            {
+                "id": "1060",
+                "description": "Banco Pichincha"
+            },
+            {
+                "id": "1047",
+                "description": "Banco Mundo Mujer"
+            },
+            {
+                "id": "1006",
+                "description": "Banco Itaú"
+            },
+            {
+                "id": "1012",
+                "description": "Banco GNB Sudameris"
+            },
+            {
+                "id": "1063",
+                "description": "Banco Finandina"
+            },
+            {
+                "id": "1062",
+                "description": "Banco Falabella"
+            },
+            {
+                "id": "1023",
+                "description": "Banco de Occidente"
+            },
+            {
+                "id": "1059",
+                "description": "BANCO DE LAS MICROFINANZAS BANCAMIA"
+            },
+            {
+                "id": "1001",
+                "description": "Banco de Bogotá"
+            },
+            {
+                "id": "1066",
+                "description": "Banco Cooperativo Coopcentral"
+            },
+            {
+                "id": "1032",
+                "description": "Banco Caja Social"
+            },
+            {
+                "id": "1040",
+                "description": "Banco Agrario de Colombia"
+            },
+            {
+                "id": "1059",
+                "description": "BANCAMIA S.A."
+            },
+            {
+                "id": "1558",
+                "description": "Ban100"
+            },
+            {
+                "id": "1052",
+                "description": "AV Villas"
+            }
+        ],
+        "processing_modes": [
+            "aggregator"
+        ]
+    }
+]
