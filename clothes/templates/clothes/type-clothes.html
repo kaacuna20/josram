@@ -22,9 +22,9 @@ JOSRAM - {{type.title}}
     <div>
         <h1>{{type.title}} </h1>
     </div>
+    
+    {% include 'clothes/includes/header-filter.html' %}
     {% if page_obj %}
-    {% include "clothes/includes/header-filter.html" %}
-   
     <div class="filters">
       <ul class="nav nav-pills">
     {% if nav_colors %}

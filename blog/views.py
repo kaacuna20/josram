@@ -57,7 +57,7 @@ class PostDetails(View):
         comment_form = CommentForm(request.POST)
         print(comment_form.is_valid())
         if comment_form.is_valid():
-            print(True)
+            
             comment = comment_form.save(commit=False)
             comment.post = post
             comment.save()

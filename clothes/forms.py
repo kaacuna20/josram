@@ -3,7 +3,6 @@ from .models import Comment
 
 
 class ClotheForm(forms.Form):
-
     
     def __init__(self, clothe, *args, **kwargs):
         super().__init__(*args, **kwargs)

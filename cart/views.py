@@ -24,6 +24,7 @@ class CartView(View):
     
     def get(self, request):
         stored_clothes = request.session.get("cart_clothes")
+        print(stored_clothes)
         context = {}
         len_cart = 0
         if request.session.get("cart_clothes") is not None:
@@ -32,23 +33,22 @@ class CartView(View):
         if  stored_clothes is None or len(stored_clothes)==0:
             context["carts"] = []
             context["has_clothes"] = False
-        else:
-            stored_id = [item["id"] for item in stored_clothes]
-            stored_cant = [item["cant"] for item in stored_clothes] 
-            clothes = SizeClothes.objects.filter(id__in=stored_id)
+
+        else: 
             index = 0
             cart = []
-            for clothe in clothes:
-                quantity = stored_cant[index]
-                total_price = quantity*clothe.color_clothe.clothes.price
+            for clothe in stored_clothes:
+                quantity = clothe["cant"]
+                clothe_stored = SizeClothes.objects.get(pk=clothe["id"])
+                total_price = quantity*clothe_stored.color_clothe.clothes.price
                 cart.append({
-                "size_pk": clothe.pk,
-                "name": clothe.color_clothe.clothes.name,
-                "slug": clothe.color_clothe.clothes.slug,
-                "size": clothe.size,
-                "color": clothe.color_clothe.color,
-                "img": clothe.color_clothe.main_image.url,
-                "price": clothe.color_clothe.clothes.price,
+                "size_pk": clothe_stored.pk,
+                "name": clothe_stored.color_clothe.clothes.name,
+                "slug": clothe_stored.color_clothe.clothes.slug,
+                "size": clothe_stored.size,
+                "color": clothe_stored.color_clothe.color,
+                "img": clothe_stored.color_clothe.main_image.url,
+                "price": clothe_stored.color_clothe.clothes.price,
                 "quantity": quantity,
                 "total_price": total_price
                 })
@@ -74,7 +74,6 @@ class CartView(View):
         if "sizes_clothes_pk" in request.POST:
             sizes_clothes_id = int(request.POST["sizes_clothes_pk"])
             quantity = int(request.POST["sizes_clothes_cant"])
-
             #extract all 'id' and quantity from the list stored_clothes for separated
             stored_id = [item["id"] for item in stored_clothes]
 
@@ -83,7 +82,7 @@ class CartView(View):
                 # get the slug to redirect to 'clothe-details' route
                 slug_clothe = SizeClothes.objects.get(pk=sizes_clothes_id)
                 clothe_choosed = {"id":sizes_clothes_id, "cant":quantity}
-                # add the tuple in the list stored_clothe
+                # add the dictionary in the list stored_clothe
                 stored_clothes.append(clothe_choosed)
                 # save it in the session
                 request.session["cart_clothes"] = stored_clothes
@@ -102,16 +101,35 @@ class CartView(View):
             messages.success(request, f'Se agregó {name} al carrito!')
                 
             return HttpResponseRedirect("/clothe/" + slug_clothe.color_clothe.clothes.slug)
-
-        if "sizes_pk" in request.POST:
+    
+        if "delete" in request.POST:
             print(stored_clothes)
-            # delete a clothe in the cart
-            clothe_to_delete = {"id":int(request.POST["sizes_pk"]), "cant":int(request.POST["sizes_cant"])}
-            print(clothe_to_delete)
+            clothe_to_delete_id = int(request.POST["sizes_pk"])
+            clothe_to_delete_cant = int(request.POST["cant_product"])
+            print(f"{clothe_to_delete_id}: {clothe_to_delete_cant}")
+            clothe_to_delete = {"id":clothe_to_delete_id, "cant":clothe_to_delete_cant}
             stored_clothes.remove(clothe_to_delete)
             #stored_clothes.clear()
+            # Save the updated list in the session
             request.session["cart_clothes"] = stored_clothes
             return HttpResponseRedirect("/cart")
+        
+        clothe_to_change_quantity = {"id":int(request.POST["sizes_pk"]), "cant":int(request.POST["cant_product"])}
+            # get index  
+        index = stored_clothes.index(clothe_to_change_quantity)
+
+        if "plus" in request.POST:
+            stored_clothes[index]["cant"] += 1
+            request.session["cart_clothes"] = stored_clothes
+            return HttpResponseRedirect("/cart")
+        
+        elif "minus" in request.POST:
+            if stored_clothes[index]["cant"] > 1:
+                stored_clothes[index]["cant"] -= 1
+        request.session["cart_clothes"] = stored_clothes
+        return HttpResponseRedirect("/cart")
+        
+        
         
        
         

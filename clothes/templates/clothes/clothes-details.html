@@ -159,6 +159,20 @@
         width: 100% !important;
     }
 }
+
+.quantity-input input[type="number"] {
+    width: 40px; /* Adjust width as needed */
+    text-align: center; /* Center the text */
+    border: 0px solid #ced4da;
+    readonly;
+}
+
+.quantity-input input[type="number"]::-webkit-inner-spin-button,
+.quantity-input input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0; /* Optional: remove the margin */
+    display: none; /* Hide the default spin buttons */
+}
 </style>
 {% endblock %}
 
@@ -216,11 +230,18 @@
             <img class="modal-content" id="modal-image">
         </div>
 
-        <div class="col-md-5 order-md-1 mx-auto">
+        <div class="col-md-5 order-md-1 mx-auto pt-3">
             <div>
                 <span>JOSRAM</span>
                 <h2>{{ clothe_details.name|title }}</h2>
             </div>
+            {% if clothe_details.avg_rating %}
+            <div class="py-1">
+               
+                <span><strong>Calificación de las reseñas: </strong>{{clothe_details.avg_rating}}</span>
+                
+            </div>
+            {% endif %}
 
             <div class="py-2">
                 {% load custom_filters %}
@@ -230,7 +251,7 @@
                 {% endif %}
             </div>
 
-            <div class="py-2">
+            <div class="py-0">
                 <form action="{% url 'clothes-details' clothe_details.slug %}" method="POST">
                     {% csrf_token %}
                     <h4 class="mt-2">{{ form.size.label_tag }}</h4>
@@ -253,13 +274,19 @@
                         {% endfor %}
                     </div>
 
-                    <h4 class="mt-2">{{ form.cant.label_tag }}</h4>
-                    <div class="py-2">
-                        <label id="quantity" style="border-radius: 50%;">
+                    <div class="py-2 d-flex align-items-center">
+                        <button type="button" class="btn btn-dark" id="decrement-btn">-</button>
+                        <div class="quantity-input" id="quantity">
                             {{ form.cant }}
-                        </label>
+                        </div>
+                        <button type="button" class="btn btn-dark" id="increment-btn">+</button>
                     </div>
-
+                        <!--<div class="py-2 d-flex justify-content-center align-items-center">
+                            <button type="button"  name="minus" class="btn btn-dark ">-</button>
+                            <input type="number"  name="choosed_quantity" value="1" min="1" readonly class="form-control text-center" style="width: 60px;">
+                            <button type="button"  name="plus" class="btn btn-dark ">+</button>
+                        </div>-->
+                    
                     {% if not is_enough %}
                     <span style="font-style: italic;">
                         <i class="bi bi-exclamation-circle"></i>
@@ -276,12 +303,20 @@
                             <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0"/>
                             <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
                         </svg>
-                        Hay {{ clothe_details.name|title }} disponible!
+                        Hay {{ clothe_details.name|title }} disponible!{{ size_clothes.pk }}
                     </span>
                     {% endif %}
                     <div class="py-2 ">
                         <button class="btn btn-warning rounded-pill mb-2" type="submit" name="verify">Verificar stock</button>
                     </div>
+                    <span style="font-style: italic;">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-diamond" viewBox="0 0 16 16" style="background-color:yellow;">
+                            <path d="M6.95.435c.58-.58 1.52-.58 2.1 0l6.515 6.516c.58.58.58 1.519 0 2.098L9.05 15.565c-.58.58-1.519.58-2.098 0L.435 9.05a1.48 1.48 0 0 1 0-2.098zm1.4.7a.495.495 0 0 0-.7 0L1.134 7.65a.495.495 0 0 0 0 .7l6.516 6.516a.495.495 0 0 0 .7 0l6.516-6.516a.495.495 0 0 0 0-.7L8.35 1.134z"/>
+                            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+                          </svg>
+                        Verifica antes de ir a comprar o guardar al carrito!
+                    </span>
                 </form>
 
                 {% if not added_cart %}
@@ -369,7 +404,7 @@
                                 {{ form_field.errors }}
                             </div>
                             {% endfor %}
-                            <button type="submit" name="comment" class="btn btn-secondary mt-2 mx-2">Comentar</button>  
+                            <button class="btn btn-secondary mt-2 mx-2">Comentar</button>  
                         </form>
                     </div>     
                                
@@ -429,8 +464,6 @@
     </div>
   
 </section>
-{% include "clothes/follow.html" %}
-
 
 
 <script>
@@ -468,6 +501,22 @@
             } else {
                 console.log('Web Share API not supported');
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const decrementBtn = document.getElementById('decrement-btn');
+            const incrementBtn = document.getElementById('increment-btn');
+            const quantityInput = document.getElementById('{{ form.cant.auto_id }}');
+        
+            decrementBtn.addEventListener('click', function() {
+                if (parseInt(quantityInput.value) > 1) {
+                    quantityInput.value = parseInt(quantityInput.value) - 1;
+                }
+            });
+        
+            incrementBtn.addEventListener('click', function() {
+                quantityInput.value = parseInt(quantityInput.value) + 1;
+            });
         });
     </script>
 
