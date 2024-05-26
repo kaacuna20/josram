@@ -8,9 +8,7 @@ from django.urls import reverse
 from django.core.paginator import Paginator
 
 # Create your views here.
-# paginator = Paginator(all_products, 6)
-#page_number = request.GET.get('page')
-#page_obj = paginator.get_page(page_number)
+
 
 class PostListView(ListView):
     template_name = "blog/blogs.html"

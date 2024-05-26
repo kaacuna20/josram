@@ -235,13 +235,7 @@
                 <span>JOSRAM</span>
                 <h2>{{ clothe_details.name|title }}</h2>
             </div>
-            {% if clothe_details.avg_rating %}
-            <div class="py-1">
-               
-                <span><strong>Calificación de las reseñas: </strong>{{clothe_details.avg_rating}}</span>
-                
-            </div>
-            {% endif %}
+           
 
             <div class="py-2">
                 {% load custom_filters %}
@@ -281,11 +275,7 @@
                         </div>
                         <button type="button" class="btn btn-dark" id="increment-btn">+</button>
                     </div>
-                        <!--<div class="py-2 d-flex justify-content-center align-items-center">
-                            <button type="button"  name="minus" class="btn btn-dark ">-</button>
-                            <input type="number"  name="choosed_quantity" value="1" min="1" readonly class="form-control text-center" style="width: 60px;">
-                            <button type="button"  name="plus" class="btn btn-dark ">+</button>
-                        </div>-->
+                
                     
                     {% if not is_enough %}
                     <span style="font-style: italic;">
@@ -303,7 +293,7 @@
                             <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0"/>
                             <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
                         </svg>
-                        Hay {{ clothe_details.name|title }} disponible!{{ size_clothes.pk }}
+                        Hay {{ clothe_details.name|title }} disponible!
                     </span>
                     {% endif %}
                     <div class="py-2 ">
@@ -372,7 +362,7 @@
                 </div>
 
                 <div class="py-2"> <!-- Adjust padding here -->
-                    <button type="button" class="btn btn-outline-primary" id="shareBtn">
+                    <button type="button" class="btn btn-outline-dark" id="shareBtn">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
                             <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5m-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3"></path>
                         </svg>
@@ -385,87 +375,77 @@
 </section>
 
 <section id="comments">
-    <div class="accordion" id="accordionExample">
+    <div class="accordion" id="accordionComments">
         <div class="accordion-item">
             <h2 class="accordion-header">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="font-weight: bold;">
-                Dejar una reseña
-            </button>
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="font-weight: bold;">
+                    Dejar una reseña
+                </button>
             </h2>
-            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionComments">
                 <div class="accordion-body">
-                    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-                        <form action="{% url "clothes-details" clothe_details.slug %}" method="POST">
-                            {% csrf_token %}
-                            {% for form_field in comment_form %}
-                            <div class="form-control {% if form_field.errors %} errors {% endif %}" >
-                                {{form_field.label_tag }}
-                                {{ form_field }}
-                                {{ form_field.errors }}
-                            </div>
-                            {% endfor %}
-                            <button class="btn btn-secondary mt-2 mx-2">Comentar</button>  
-                        </form>
-                    </div>     
-                               
-                    
+                    <form action="{% url "clothes-details" clothe_details.slug %}" method="POST">
+                        {% csrf_token %}
+                        {% for form_field in comment_form %}
+                        <div class="form-control {% if form_field.errors %} errors {% endif %}" >
+                            {{form_field.label_tag }}
+                            {{ form_field }}
+                            {{ form_field.errors }}
+                        </div>
+                        {% endfor %}
+                        <button class="btn btn-secondary mt-2 mx-2">Comentar</button>  
+                    </form>
+                </div>     
             </div>
         </div>
     </div>
 
-
-
-    <div class="accordion mt-3" id="accordionExample">
+    <div class="accordion mt-3" id="accordionCommentsReviews">
         <div class="accordion-item">
             <h2 class="accordion-header">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="font-weight: bold;">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseReviews" aria-expanded="true" aria-controls="collapseReviews" style="font-weight: bold;">
                     Reseñas de Clientes
                 </button>
-                </h2>
-                <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
+            </h2>
+            <div id="collapseReviews" class="accordion-collapse collapse show" data-bs-parent="#accordionCommentsReviews">
+                <div class="accordion-body">
                     <div class="my-3 p-3 bg-body rounded shadow-sm">
                         <h5 class="border-bottom pb-2 mb-2">Reseñas</h5>
                         {% if comments %}
                         {% for comment in comments %}
                         <div class="pb-3 mb-0 small lh-sm border-bottom w-100 mt-2 mb-0 py-0">
                             <div class="row">
-                                <div class="col-lg-2 mx-0 py-0 d-flex flex-column align-items-center" >
+                                <div class="col-lg-2 mx-0 py-0 d-flex flex-column align-items-center">
                                     <p style="font-size: 32px; font-weight: 700; margin-bottom: 0; margin-left: 15px;" class="align-items-center">
                                         {{ comment.rating }}.0
-                                        <div >{{ comment.get_rating_display }}</div>
+                                        <div>{{ comment.get_rating_display }}</div>
                                     </p>
                                 </div>
-                            <div class="col-lg-8 ">
-                                <div class="d-flex justify-content-between ">
-                                    <strong class="text-gray-dark mx-0" style="font-size: 20px;">@{{comment.user_name}}</strong>
-                                     
+                                <div class="col-lg-8">
+                                    <div class="d-flex justify-content-between">
+                                        <strong class="text-gray-dark mx-0" style="font-size: 20px;">@{{comment.user_name}}</strong>
+                                    </div>
+                                    <span class="d-block mt-1 mx-0">{{ comment.comment}}</span>
                                 </div>
-                                <span class="d-block mt-1 mx-0">{{ comment.comment}}</span>
-                            </div>
-                            <div class="col-lg-2">
-                                <div class="d-flex justify-content-between mx-3">
-                                    <p >{{ comment.date|date:"d/m/Y"}}</p>
+                                <div class="col-lg-2">
+                                    <div class="d-flex justify-content-between mx-3">
+                                        <p>{{ comment.date|date:"d/m/Y"}}</p>
+                                    </div>
                                 </div>
-                              
                             </div>
-                        </div>
                         </div>
                         {% endfor %}
                         {% else %}
-                        <h5 class=" pb-2 mb-2">No hay reseñas hasta el momento!</h5>
+                        <h5 class="pb-2 mb-2">No hay reseñas hasta el momento!</h5>
                         {% endif %}
-                        
                     </div>
                 </div>
             </div>
-            </div>
         </div>
     </div>
-  
 </section>
 
-
+{% include "clothes/follow.html" %}
 <script>
     function changeImage(src) {
         document.getElementById("main-image").src = src;  # Cambia el src de la imagen grande
@@ -517,6 +497,27 @@
             incrementBtn.addEventListener('click', function() {
                 quantityInput.value = parseInt(quantityInput.value) + 1;
             });
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const forms = document.querySelectorAll("form");
+            forms.forEach(form => {
+                form.addEventListener("submit", function(event) {
+                    const scrollPos = window.scrollY || document.documentElement.scrollTop;
+                    const input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = "scrollPos";
+                    input.value = scrollPos;
+                    form.appendChild(input);
+                });
+            });
+        
+            // Scroll to the position from the URL parameter if it exists
+            const urlParams = new URLSearchParams(window.location.search);
+            const scrollPos = urlParams.get("scrollPos");
+            if (scrollPos) {
+                window.scrollTo(0, parseInt(scrollPos));
+            }
         });
     </script>
 

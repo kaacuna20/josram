@@ -64,6 +64,24 @@ sección de pago
   }
 }
 
+.payment-icons img {
+    margin-left: 10px;
+  }
+
+
+
+.svg-container {
+  text-align: center;
+  margin: 1em 0;
+}
+
+.svg-container svg {
+  width: 200px;  /* Adjust the width as needed */
+  height: auto; /* Maintain aspect ratio */
+}
+
+
+
 </style>
 {% include "cart/includes/style.html" %}
 {% endblock %}
@@ -75,8 +93,8 @@ sección de pago
       <div class="row g-5">
           <div class="col-md-5 col-lg-4 order-md-last fixed-column">
               <h4 class="d-flex justify-content-between align-items-center mb-3">
-                  <span class="text-primary">Tu carrito</span>
-                  <span class="badge bg-primary rounded-pill">{{number}}</span>
+                  <span class="text-dark">Tu carrito</span>
+                  <span class="badge bg-dark rounded-pill">{{number}}</span>
               </h4>
               <ul class="list-group mb-1">
                   {% for clothe in carts %}
@@ -144,7 +162,7 @@ sección de pago
                         <input type="text" class="form-control" id="address" name="address" placeholder="cra 20A #23c-45" required>
                         <div class="invalid-feedback">Por favor ingresa tu dirección</div>
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                         <label for="state" class="form-label">Departamento</label>
                         <input type="text" class="form-control" id="state" name="stade" placeholder="Departamento de tu municipio" required>
                         <div class="invalid-feedback">Por favor ingresa tu departamento.</div>
@@ -154,7 +172,7 @@ sección de pago
                         <input type="text" class="form-control" id="city" name="city" placeholder="Tu ciudad o municipio" required>
                         <div class="invalid-feedback">Por favor ingresa tu ciudad.</div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label for="zip" class="form-label">Código postal <span class="text-muted">(Opcional)</span></label>
                         <input type="text" class="form-control" id="zip" name="zip_code">
                     </div>
@@ -178,34 +196,62 @@ sección de pago
                     <h4 class="card-title">Pagos</h4>
                     <p>Todas las transacciones son seguras y están encriptadas.</p>
                 </div>
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title">Métodos de pago disponibles</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row d-flex justify-content-center">
-                            <div class="col-6 col-md-4 col-lg-2 d-flex justify-content-center">
-                                <i class="payment-icon fab fa-cc-visa"></i>
+                <div class="accordion accordion-flush" id="accordionFlushExample">
+                    <div class="accordion-item">
+                      <h2 class="accordion-header">
+                        <button class="accordion-button collapsed d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                          <div class="d-flex align-items-center flex-grow-1">
+                            <div class="form-check me-2">
+                              <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
                             </div>
-                            <div class="col-6 col-md-4 col-lg-2 d-flex justify-content-center">
-                                <i class="payment-icon fab fa-cc-mastercard"></i>
+                            <span class="me-auto">Checkout Mercadopago</span>
+                          </div>
+                          
+                        </button>
+                      </h2>
+                      <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div class="row align-items-center">
+                            <div class="payment-icons align-items-center col-12 mt-3 d-flex justify-content-center">
+                              <img src="{% static 'cart/logos/visa.svg' %}" alt="Visa" width="50" height="50" class="img-fluid">
+                              <img src="{% static 'cart/logos/american_express.svg' %}" alt="American Express" width="50" height="50" class="img-fluid ms-2">
+                              <img src="{% static 'cart/logos/dinners.svg' %}" alt="Diners" width="50" height="50" class="img-fluid ms-2">
+                              <img src="{% static 'cart/logos/mastercard.svg' %}" alt="MasterCard" width="50" height="50" class="img-fluid ms-2">
+                              <img src="{% static 'cart/logos/mercadopago.svg' %}" alt="MercadoPago" width="50" height="50" class="img-fluid ms-2">
                             </div>
-                            <div class="col-6 col-md-4 col-lg-2 d-flex justify-content-center">
-                                <i class="payment-icon fab fa-cc-amex"></i>
-                            </div>
-                            <div class="col-6 col-md-4 col-lg-2 d-flex justify-content-center mt-2">
-                                <img src="https://http2.mlstatic.com/frontend-assets/mp-web-navigation/ui-navigation/6.7.12/mercadopago/logo__large.png" alt="MercadoPago" class="payment-icon img-fluid">
-                            </div>
-                            <div class="col-6 col-md-4 col-lg-2 d-flex justify-content-center">
-                                <img src="https://d1yjjnpx0p53s8.cloudfront.net/styles/logo-thumbnail/s3/082017/untitled-2_15.png?itok=5Wj0ru82" alt="PSE" class="payment-icon img-fluid">
-                            </div>
+                          </div>
+                        <div class="svg-container text-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="-270.8 371 102 52" class="eHdoK">
+                            <path fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="2" width="100" height="100" d="M-182 404v16.8c0 .7-.4 1.2-1 1.2h-75.7c-.7 0-1.2-.6-1.2-1.2v-47.6c0-.7.6-1.2 1.2-1.2h75.7c.7 0 1 .6 1 1.2V395m-78-14h78m-17 18h27m-3.9-4.6 4.5 4.6-4.5 4.6"></path>
+                            <circle cx="-255.5" cy="376.5" r="1.5" fill="currentColor"></circle>
+                            <circle cx="-250.5" cy="376.5" r="1.5" fill="currentColor"></circle>
+                            <circle cx="-245.5" cy="376.5" r="1.5" fill="currentColor"></circle>
+                          </svg>
                         </div>
+                        <div class="accordion-body text-center mx-5">
+                          Luego de hacer clic en “Ir a pagar”, serás redirigido a Checkout Mercado Pago para completar tu compra de forma segura.
+                        </div>
+                      </div>
                     </div>
-                    <div class="card-footer text-center">
-                        <p class="text-muted mb-0">Luego de hacer clic en “Ir a pagar”, serás redirigido a Checkout Mercado Pago para completar tu compra de forma segura.</p>
+                    <div class="accordion-item">
+                      <h2 class="accordion-header">
+                        <button class="accordion-button collapsed d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+                          <div class="d-flex align-items-center flex-grow-1">
+                            <div class="form-check me-2">
+                              <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+                            </div>
+                            <span class="me-auto">Transferencia Bancaria Directa</span>
+                          </div>
+                        </button>
+                      </h2>
+                      <div id="flush-collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body text-center mx-5">
+                          Paga tu pedido por transferencia directa a nuestra cuenta bancaria y nos envías el comprobante (pantallazo) a WhatsApp con tu número de pedido. (El número de cuenta lo verás al finalizar el pedido) Cuentas disponibles: Ahorros Bancolombia, Nequi o DaviPlata.
+                        </div>
+                      </div>
                     </div>
-                </div>
-                <button id="checkout-button" class="w-100 btn btn-primary btn-lg mt-2" type="submit" style="background-color:black;">Ir a pagar</button>
+                  </div>
+                  
+                <button id="checkout-button" class="w-100 btn btn-primary btn-lg mt-5" type="submit" style="background-color:black;">Ir a pagar</button>
             </form>
           </div>
       </div>

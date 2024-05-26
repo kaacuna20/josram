@@ -3,131 +3,113 @@ from django.http import HttpResponseRedirect
 from django.views import View
 from clothes.models import SizeClothes
 from django.contrib import messages
-
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from datetime import datetime, timedelta
 from django.http import JsonResponse, HttpResponse
-import json
 from django.views.decorators.http import require_POST
-import logging
+from django.template.loader import render_to_string
+from django.http import JsonResponse
+
 # SDK de Mercado Pago
 import mercadopago
-# Agrega credenciales
 
-# Create your views here.
-# Get an instance of a logger
-logger = logging.getLogger(__name__)
+
 
 class CartView(View):
-
     
     def get(self, request):
         stored_clothes = request.session.get("cart_clothes")
-        print(stored_clothes)
+        is_enough = True
         context = {}
         len_cart = 0
         if request.session.get("cart_clothes") is not None:
             len_cart = len(request.session.get("cart_clothes"))
-        
-        if  stored_clothes is None or len(stored_clothes)==0:
+
+        if stored_clothes is None or len(stored_clothes) == 0:
             context["carts"] = []
             context["has_clothes"] = False
-
-        else: 
-            index = 0
+        else:
             cart = []
             for clothe in stored_clothes:
+                is_stock_enough = True
                 quantity = clothe["cant"]
                 clothe_stored = SizeClothes.objects.get(pk=clothe["id"])
-                total_price = quantity*clothe_stored.color_clothe.clothes.price
+                if clothe_stored.cant < quantity or not clothe_stored.in_stock:
+                    is_enough = False
+                    is_stock_enough = False
+                total_price = quantity * clothe_stored.color_clothe.clothes.price
                 cart.append({
-                "size_pk": clothe_stored.pk,
-                "name": clothe_stored.color_clothe.clothes.name,
-                "slug": clothe_stored.color_clothe.clothes.slug,
-                "size": clothe_stored.size,
-                "color": clothe_stored.color_clothe.color,
-                "img": clothe_stored.color_clothe.main_image.url,
-                "price": clothe_stored.color_clothe.clothes.price,
-                "quantity": quantity,
-                "total_price": total_price
+                    "size_pk": clothe_stored.pk,
+                    "name": clothe_stored.color_clothe.clothes.name,
+                    "slug": clothe_stored.color_clothe.clothes.slug,
+                    "size": clothe_stored.size,
+                    "color": clothe_stored.color_clothe.color,
+                    "img": clothe_stored.color_clothe.main_image.url,
+                    "price": clothe_stored.color_clothe.clothes.price,
+                    "quantity": quantity,
+                    "total_price": total_price,
+                    "is_stock_enough": is_stock_enough
                 })
-                index += 1
-            
+
             sum_prices = sum([item["total_price"] for item in cart])
-            
+
             context["carts"] = cart
             context["has_clothes"] = True
             context["number"] = len_cart
             context["sum_prices"] = sum_prices
-           
+            context["is_enough"] = is_enough
+
         return render(request, "cart/my-cart.html", context)
 
-   
     def post(self, request):
-
         stored_clothes = request.session.get("cart_clothes")
-
         if stored_clothes is None:
             stored_clothes = []
-        
+
+        scroll_pos = request.POST.get("scrollPos", "0")
+
         if "sizes_clothes_pk" in request.POST:
             sizes_clothes_id = int(request.POST["sizes_clothes_pk"])
             quantity = int(request.POST["sizes_clothes_cant"])
-            #extract all 'id' and quantity from the list stored_clothes for separated
             stored_id = [item["id"] for item in stored_clothes]
 
-            # verify if the id of size clothe is not in the session to add it
             if sizes_clothes_id not in stored_id:
-                # get the slug to redirect to 'clothe-details' route
                 slug_clothe = SizeClothes.objects.get(pk=sizes_clothes_id)
-                clothe_choosed = {"id":sizes_clothes_id, "cant":quantity}
-                # add the dictionary in the list stored_clothe
+                clothe_choosed = {"id": sizes_clothes_id, "cant": quantity}
                 stored_clothes.append(clothe_choosed)
-                # save it in the session
                 request.session["cart_clothes"] = stored_clothes
                 name = SizeClothes.objects.get(pk=sizes_clothes_id).color_clothe.clothes.name
-
-            # if the 'id' of size clothe is in the session, change the quantity 
             elif sizes_clothes_id in stored_id:
                 slug_clothe = SizeClothes.objects.get(pk=sizes_clothes_id)
                 name = SizeClothes.objects.get(pk=sizes_clothes_id).color_clothe.clothes.name
                 for item in stored_clothes:
                     if item["id"] == sizes_clothes_id:
                         item["cant"] = quantity
-                # save it in the session
                 request.session["cart_clothes"] = stored_clothes
-            # send a pop alerting that the clothe is saved in the cart
             messages.success(request, f'Se agregó {name} al carrito!')
-                
-            return HttpResponseRedirect("/clothe/" + slug_clothe.color_clothe.clothes.slug)
-    
+            return HttpResponseRedirect(f"/clothe/{slug_clothe.color_clothe.clothes.slug}?scrollPos={scroll_pos}")
+
         if "delete" in request.POST:
-            print(stored_clothes)
             clothe_to_delete_id = int(request.POST["sizes_pk"])
             clothe_to_delete_cant = int(request.POST["cant_product"])
-            print(f"{clothe_to_delete_id}: {clothe_to_delete_cant}")
-            clothe_to_delete = {"id":clothe_to_delete_id, "cant":clothe_to_delete_cant}
+            clothe_to_delete = {"id": clothe_to_delete_id, "cant": clothe_to_delete_cant}
             stored_clothes.remove(clothe_to_delete)
-            #stored_clothes.clear()
-            # Save the updated list in the session
             request.session["cart_clothes"] = stored_clothes
-            return HttpResponseRedirect("/cart")
-        
-        clothe_to_change_quantity = {"id":int(request.POST["sizes_pk"]), "cant":int(request.POST["cant_product"])}
-            # get index  
+            return HttpResponseRedirect(f"/cart?scrollPos={scroll_pos}")
+
+        clothe_to_change_quantity = {"id": int(request.POST["sizes_pk"]), "cant": int(request.POST["cant_product"])}
         index = stored_clothes.index(clothe_to_change_quantity)
 
         if "plus" in request.POST:
             stored_clothes[index]["cant"] += 1
             request.session["cart_clothes"] = stored_clothes
-            return HttpResponseRedirect("/cart")
-        
+            return HttpResponseRedirect(f"/cart?scrollPos={scroll_pos}")
         elif "minus" in request.POST:
             if stored_clothes[index]["cant"] > 1:
                 stored_clothes[index]["cant"] -= 1
-        request.session["cart_clothes"] = stored_clothes
-        return HttpResponseRedirect("/cart")
+            request.session["cart_clothes"] = stored_clothes
+        return HttpResponseRedirect(f"/cart?scrollPos={scroll_pos}")
         
         
         

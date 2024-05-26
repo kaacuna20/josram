@@ -39,6 +39,7 @@ CSRF_TRUSTED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'policies',
     'blog',
     'clothes',
     'cart',
@@ -138,7 +139,7 @@ STATICFILES_DIRS = [
 ]
 
 
-MEDIA_ROOT = BASE_DIR / "clothes/static/clothes/images"
+MEDIA_ROOT = BASE_DIR / "/uploads"
 MEDIA_URL = "/josran-media/"
 
 # Default primary key field type

@@ -100,20 +100,21 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'josram-blog' %}">Blog</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'all-products' %}">Todos los productos</a>
-                        </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Políticas
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#">Política de cambios y devoluciones</a></li>
-                                <li><a class="dropdown-item" href="#">Política de privacidad</a></li>
-                                <li><a class="dropdown-item" href="#">Política de envíos</a></li>
-                                <li><a class="dropdown-item" href="#">Términos y condiciones</a></li>
+                                <li><a class="dropdown-item" href="{% url 'change-devolutions'%}">Política de cambios y devoluciones</a></li>
+                                <li><a class="dropdown-item" href="{% url 'privacy'%}">Política de privacidad</a></li>
+                                <li><a class="dropdown-item" href="{% url 'shipments'%}">Política de envíos</a></li>
+                                <li><a class="dropdown-item" href="{% url 'terms-and-conditions'%}">Términos y condiciones</a></li>
                             </ul>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'all-products' %}">Todos los productos</a>
+                        </li>
+                       
                     </ul>
                 </div>
             </div>

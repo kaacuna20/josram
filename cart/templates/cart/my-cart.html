@@ -8,9 +8,7 @@ Tu carrito - JOSRAM
 
 {% block css_files %}
 <link rel="stylesheet" href="{% static "cart/all-products.css" %}"/>
-<styles>
-    
-</styles>
+
 {% include "cart/includes/style.html" %}
 {% endblock %}
 
@@ -67,7 +65,7 @@ Tu carrito - JOSRAM
                                                     {% csrf_token %}
                                                     <input type="submit" value="-" name="minus" class="btn btn-dark">
                                                     <input type="number" id="cant_product_{{ clothe.size_pk }}" name="cant_product"
-                                                           value="{{ clothe.quantity }}" min="1" readonly class="form-control text-center" style="width: 60px;">
+                                                           value="{{ clothe.quantity }}" min="1" readonly class="form-control text-center" style="width: 60px; padding-right:7px;">
                                                     <input type="submit" value="+" name="plus" class="btn btn-dark ">
                                                     <input type="hidden" value="{{ clothe.size_pk }}" name="sizes_pk">
                                                   
@@ -79,6 +77,16 @@ Tu carrito - JOSRAM
                                                     </button>
                                                 </form>
                                             </div>
+                                            {% if not clothe.is_stock_enough%}
+                                            <div>
+                                                <span style="font-style: italic;">
+                                                    <svg style="color:red;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                                        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+                                                    </svg>
+                                                    No puedes agregar más {{clothe.name}}!</span>
+                                            </div>
+                                            {% endif %}
                                         </td>
                                         <td class="col-md-3 col-sm-6 align-middle">
                                             <div class="p-4 d-flex flex-column position-static">
@@ -103,16 +111,42 @@ Tu carrito - JOSRAM
             </h2>
             <form action="{% url "cheackout-buy" %}" method="POST">
                 {% csrf_token %}
+                {% if not is_enough %}
+                <div class="py-2">
+                    <button type="submit" name="proceed_to_checkout" class="btn btn-outline-dark rounded-pill mt-2 w-100 w-lg-50 disabled">Ir a comprar</button>
+                </div>
+                {% else %}
                 <div class="py-2">
                     <button type="submit" name="proceed_to_checkout" class="btn btn-outline-dark rounded-pill mt-2 w-100 w-lg-50">Ir a comprar</button>
                 </div>
+                {% endif %}
             </form>
         </div>
     </div>
     {% endif %}
+
 </section>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const forms = document.querySelectorAll("form");
+        forms.forEach(form => {
+            form.addEventListener("submit", function(event) {
+                const scrollPos = window.scrollY || document.documentElement.scrollTop;
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "scrollPos";
+                input.value = scrollPos;
+                form.appendChild(input);
+            });
+        });
     
-</script>
+        // Scroll to the position from the URL parameter if it exists
+        const urlParams = new URLSearchParams(window.location.search);
+        const scrollPos = urlParams.get("scrollPos");
+        if (scrollPos) {
+            window.scrollTo(0, parseInt(scrollPos));
+        }
+    });
+    </script>
 {% endblock %}

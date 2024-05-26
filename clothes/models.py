@@ -1,5 +1,4 @@
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
 
 # Create your models here.
 
@@ -28,7 +27,7 @@ class Clothes(models.Model):
      slug = models.SlugField(default="", blank=True, null=False, db_index=True)
      slug_type = models.SlugField(default="", blank=True, null=False, db_index=True)
      date = models.DateField(auto_now=True)
-     avg_rating = models.FloatField(null=True, blank=True)
+     #avg_rating = models.FloatField(null=True, blank=True)
      
      def __str__(self):
         return f"{self.name}"

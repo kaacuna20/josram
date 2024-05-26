@@ -11,6 +11,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from blog.models import Post
 
+
 # Create your views here.
 
 
@@ -428,22 +429,23 @@ def clothe_details(request, slug):
         is_enough = False
     
     if request.method == 'POST':
-       
-        if "verify" in request.POST:
-            form = ClotheForm(size_clothes_form, request.POST)
-            if form.is_valid():
-                post_color = request.POST["color"]
-                post_size = request.POST["size"]
+        scroll_pos = request.POST.get("scrollPos", "0")
+        form = ClotheForm(size_clothes_form, request.POST)
+        if form.is_valid():
+            post_color = request.POST["color"]
+            post_size = request.POST["size"]
+            post_cant = int(request.POST["cant"])
+            if "verify" in request.POST:
                 try:
-                    sizes_clothes = SizeClothes.objects.get(color_clothe__clothes__slug=slug, color_clothe__color=post_color , size=post_size )
-                    if int(request.POST["cant"]) > sizes_clothes.cant:
+                    sizes_clothes = SizeClothes.objects.get(color_clothe__clothes__slug=slug, color_clothe__color=post_color, size=post_size )
+                    if  post_cant > sizes_clothes.cant:
                         is_enough = False
                 
                 except Exception:
                     sizes_clothes = None
                     is_enough = False
 
-                context = {
+            context = {
                     "color_clothes": color_clothes,
                     "clothe_details": clothe_select,
                     "form": form,
@@ -455,7 +457,7 @@ def clothe_details(request, slug):
                     "added_cart": added_cart
                 }
                     
-                return render(request, "clothes/clothes-details.html", context)
+            return render(request, "clothes/clothes-details.html", context)
        
         elif "comment" in request.POST:
             comment_form = CommentForm(request.POST)
@@ -464,9 +466,8 @@ def clothe_details(request, slug):
                 comment = comment_form.save(commit=False)
                 comment.clothes = clothe_select
                 comment.save()
-                return HttpResponseRedirect(reverse("clothes-details", args=[slug]))
-            else:
-                print(comment_form.errors)
+                return HttpResponseRedirect(f"clothe/{slug}?scrollPos={scroll_pos}")
+          
         
     context = {
             "color_clothes": color_clothes,
