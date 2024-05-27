@@ -49,14 +49,14 @@
 
     {% include 'clothes/includes/header-filter.html' %}
 
-    <div class="filters">
+    <div class="filters mx-5">
       <ul class="nav nav-pills">
         {% if nav_colors %}
         {% for color in nav_colors %}
         <form action="{% url 'all-products' %}" method="POST">
           {% csrf_token %}
-          <li class="nav-item dropdown">
-            <label class="btn btn-outline-dark rounded-pill px-3">
+          <li class="nav-item dropdown mx-1">
+            <label class="badge bg-dark-subtle text-dark-emphasis rounded-pill">
               <input type="hidden" value="{{ color }}" name="color">
               {{color}}
               <button type="submit" name="delete_color" class="btn-close" aria-label="Close"></button>
@@ -69,8 +69,8 @@
         {% if nav_prices %}
         <form action="{% url 'all-products' %}" method="POST">
           {% csrf_token %}
-          <li class="nav-item dropdown">
-            <label class="btn btn-outline-dark rounded-pill px-3">
+          <li class="nav-item dropdown mx-1">
+            <label class="badge bg-dark-subtle text-dark-emphasis rounded-pill">
               {% load custom_filters %}
               <input type="hidden" value="{{ nav_prices }}" name="price">
               {{nav_prices.0|currency}} - {{nav_prices.1|currency}}
@@ -84,7 +84,7 @@
         <form action="{% url 'all-products' %}" method="POST">
           {% csrf_token %}
           <li class="nav-item dropdown">
-            <button class="btn btn-secondary rounded-pill px-3" type="submit" name="delete_filters">
+            <button class="badge bg-dark-subtle text-dark-emphasis rounded-pill" type="submit" name="delete_filters">
               Eliminar todos
             </button>
           </li>

@@ -157,6 +157,9 @@ class ClothesByType(View):
         filter_session = request.session.get("filters_colors")
         price_session = request.session.get("filters_price")
         items_order = request.session.get("order_by")
+
+        if items_order is None:
+            items_order = "clothes__name"
         
         # Base QuerySet with slug_type filter
         type_clothes = ImageClothes.objects.filter(clothes__slug_type=slug_type)
@@ -262,6 +265,9 @@ class ClothesByGender(View):
         filter_session = request.session.get("filters_colors")
         price_session = request.session.get("filters_price")
         items_order = request.session.get("order_by")
+
+        if items_order is None:
+            items_order = "clothes__name"
 
          # Base QuerySet with slug_type filter
         gender_clothes = ImageClothes.objects.filter(clothes__gender=gender)

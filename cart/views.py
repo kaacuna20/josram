@@ -10,6 +10,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from django.template.loader import render_to_string
 from django.http import JsonResponse
+import secrets
 
 # SDK de Mercado Pago
 import mercadopago
@@ -112,10 +113,6 @@ class CartView(View):
         return HttpResponseRedirect(f"/cart?scrollPos={scroll_pos}")
         
         
-        
-       
-        
-
 class CheckOutView(View):
 
     def get(self, request):
@@ -123,7 +120,10 @@ class CheckOutView(View):
         stored_clothes = request.session.get("cart_clothes")
         context = {}
         len_cart = len(request.session.get("cart_clothes"))
-        cost_sent = 5000
+        cost_shipments = request.GET.get("cost_shipments")
+        
+        if cost_shipments is None:
+            cost_shipments = 8000
         
         len_cart = 0
         if request.session.get("cart_clothes") is not None:
@@ -134,34 +134,32 @@ class CheckOutView(View):
             context["has_clothes"] = False
 
         else:
-            stored_id = [item["id"] for item in stored_clothes]
-            stored_cant = [item["cant"] for item in stored_clothes] 
-            clothes = SizeClothes.objects.filter(id__in=stored_id)
-            index = 0
             cart = []
-            for clothe in clothes:
-                quantity = stored_cant[index]
-                total_price = quantity*clothe.color_clothe.clothes.price
+            for clothe in stored_clothes:
+                quantity = clothe["cant"]
+                clothe_stored = SizeClothes.objects.get(pk=clothe["id"])
+                total_price = quantity * clothe_stored.color_clothe.clothes.price
                 cart.append({
-                "size_pk": clothe.pk,
-                "name": clothe.color_clothe.clothes.name,
-                "slug": clothe.color_clothe.clothes.slug,
-                "size": clothe.size,
-                "color": clothe.color_clothe.color,
-                "img": clothe.color_clothe.main_image.url,
-                "price": clothe.color_clothe.clothes.price,
-                "quantity": quantity,
-                "total_price": total_price
+                    "size_pk": clothe_stored.pk,
+                    "name": clothe_stored.color_clothe.clothes.name,
+                    "slug": clothe_stored.color_clothe.clothes.slug,
+                    "size": clothe_stored.size,
+                    "color": clothe_stored.color_clothe.color,
+                    "img": clothe_stored.color_clothe.main_image.url,
+                    "price": clothe_stored.color_clothe.clothes.price,
+                    "quantity": quantity,
+                    "total_price": total_price,
+                    
                 })
-                index += 1
-            
-            sum_prices = sum([item["total_price"] for item in cart]) + cost_sent
+
+            sum_prices = sum([item["total_price"] for item in cart]) 
             
             context["carts"] = cart
             context["has_clothes"] = True
             context["number"] = len_cart
             context["sum_prices"] = sum_prices
-            context["cost_sent"] = cost_sent
+            context["cost_shipments"] = cost_shipments
+            context["order_josram"] = secrets.randbelow(10**12)
            
         return render(request, "cart/checkout.html", context)
     
@@ -187,11 +185,51 @@ class CheckOutView(View):
             # save it in the session
             request.session["cart_clothes"] = stored_clothes
         
-        if "checkout_mercadopago" in request.POST:
-            return HttpResponseRedirect("/cart/payment-methods")
-
         return HttpResponseRedirect("/cart/checkout")
     
+class DirectPayment(View):
+    @csrf_exempt
+    def post(self, request, id_order):
+        
+        cost_shipments = int(request.POST.get("cost_shipments"))
+        stored_clothes = request.session.get("cart_clothes")
+        cart = []
+        for clothe in stored_clothes:
+            quantity = clothe["cant"]
+            clothe_stored = SizeClothes.objects.get(pk=clothe["id"])
+            total_price = quantity * clothe_stored.color_clothe.clothes.price
+
+            cart.append({
+                    "size_pk": clothe_stored.pk,
+                    "name": clothe_stored.color_clothe.clothes.name,
+                    "slug": clothe_stored.color_clothe.clothes.slug,
+                    "size": clothe_stored.size,
+                    "color": clothe_stored.color_clothe.color,
+                    "img": clothe_stored.color_clothe.main_image.url,
+                    "price": clothe_stored.color_clothe.clothes.price,
+                    "quantity": quantity,
+                    "total_price": total_price,
+            })
+        
+        sum_prices = sum([item["total_price"] for item in cart]) + cost_shipments
+
+        payer_data = {
+                "name": request.POST.get("name"),
+                "lastname": request.POST.get("lastname"),
+                "email": request.POST.get("email"),
+                "phone": request.POST.get("contact"),
+                "address": request.POST.get("address")
+            }
+        
+        merchand_order_josram = id_order
+
+        return render(request, "cart/direct-payment-form.html",{
+            "carts": cart,
+            "payer": payer_data,
+            "merchand_order": merchand_order_josram,
+            "sum_prices": sum_prices,
+            "cost_shipments": cost_shipments
+        })
 
 
 class ReferenceView(View):
@@ -199,24 +237,18 @@ class ReferenceView(View):
     def post(self, request):
         # Get the id that are in the cart
         stored_clothes = request.session.get("cart_clothes")
-
-        stored_id = [item["id"] for item in stored_clothes]
-        stored_cant = [item["cant"] for item in stored_clothes]
-        # Get the fields that we need to add in the items references
-        clothes = SizeClothes.objects.filter(id__in=stored_id)
-        index = 0
-        cart = []
-        for clothe in clothes:
-            quantity = stored_cant[index]
-            cart.append({
-            "id": f"Item-ID-{clothe.pk}",
-            "title": clothe.color_clothe.clothes.name,
-            "description": f"Talla {clothe.size} de color {clothe.color_clothe.color}",
-            "unit_price": clothe.color_clothe.clothes.price,
-            "currency_id": "COP",
-            "quantity": quantity,
-          })
-            index += 1
+        cart_mercadopago = []
+        for clothe in stored_clothes:
+                quantity = clothe["cant"]
+                clothe_stored = SizeClothes.objects.get(pk=clothe["id"])
+                cart_mercadopago.append({
+                    "id": f"Item-ID-{clothe_stored.pk}",
+                    "title": clothe_stored.color_clothe.clothes.name,
+                    "description": f"Talla {clothe_stored.size} de color {clothe_stored.color_clothe.color}",
+                    "unit_price": clothe_stored.color_clothe.clothes.price,
+                    "currency_id": "COP",
+                    "quantity": quantity,
+                })
 
         expiration_date_from = datetime.now()
         expiration_date_to = expiration_date_from + timedelta(days=3)
@@ -227,7 +259,7 @@ class ReferenceView(View):
         preference_data = {
             "auto_return": "approved",
 
-            "items": cart,
+            "items": cart_mercadopago,
 
             "installments": 1,
             "default_installments": 1,
@@ -253,9 +285,9 @@ class ReferenceView(View):
 			"apartment": request.POST.get("home"),
 		},
             "back_urls": {
-                "success": "https://1816-191-156-249-50.ngrok-free.app/cart/success",
-                "failure": "https://1816-191-156-249-50.ngrok-free.app/cart/failure",
-                "pending": "https://1816-191-156-249-50.ngrok-free.app/cart/pending"
+                "success": "https://9c04-190-84-119-237.ngrok-free.app/cart/success",
+                "failure": "https://9c04-190-84-119-237.ngrok-free.app/cart/failure",
+                "pending": "https://9c04-190-84-119-237.ngrok-free.app/cart/pending"
             },
 
              "excluded_payment_methods": [
@@ -268,13 +300,12 @@ class ReferenceView(View):
             
             "binary_mode": True,
             "shipments":{
-            "cost": int(request.POST.get("cost_sent")),
+            "cost": int(request.POST.get("cost_shipments")),
             "mode": "not_specified",
             },
             "statement_descriptor": "Compra en JOSRAM",
-            "notification_url": f"https://1816-191-156-249-50.ngrok-free.app/cart/notification",
+            "notification_url": f"https://9c04-190-84-119-237.ngrok-free.app/cart/notification",
          
-            "external_reference": "Reference_1234",
             "expires": True,
             "expiration_date_from": f"{expiration_date_from.isoformat()}",
             "expiration_date_to": f"{expiration_date_to.isoformat()}"
@@ -361,3 +392,30 @@ def notificate(request):
         print(f"payment: {payment}" )
         print(f"merchant_order: {merchant_order}" )
         return HttpResponse("Not paid yet. Do not release your item.", status=200)
+    
+
+#APK3K2C4S9JJJ548J9RXR7R3
+#ACCOUNT SID = ACe90e72a4d8f44dfe6f0d04171fbd574f
+# AUTH TOKEN  = 4b427536c3d3e8459492b6c099736060
+#TWILIO NUMBER = +13374920319
+"""
+# Download the helper library from https://www.twilio.com/docs/python/install
+import os
+from twilio.rest import Client
+
+
+# Find your Account SID and Auth Token at twilio.com/console
+# and set the environment variables. See http://twil.io/secure
+account_sid = os.environ['TWILIO_ACCOUNT_SID']
+auth_token = os.environ['TWILIO_AUTH_TOKEN']
+client = Client(account_sid, auth_token)
+
+message = client.messages \
+                .create(
+                     body="Join Earth's mightiest heroes. Like Kevin Bacon.",
+                     from_='+13374920319',
+                     to='+573003653344'
+                 )
+
+print(message.sid)
+"""

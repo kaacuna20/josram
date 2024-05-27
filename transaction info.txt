@@ -857,3 +857,5 @@ TARGETA
     'total_paid_amount': 35000
   }
 }
+
+             <img src="{% static 'blog/images/blog_bg.png'%}" alt="hacer ejercicio" width="100%" height="100%">  
