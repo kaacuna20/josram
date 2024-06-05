@@ -1,11 +1,11 @@
 from django.db import models
-from datetime import datetime, timedelta
+from datetime import timedelta
+from django.utils import timezone
 
 # Create your models here.
 
-current_day = datetime.now().isoformat()
 
-class DirectPayment(models.Model):
+class DirectPayments(models.Model):
     order = models.IntegerField()
     payer_fullname = models.CharField(max_length=100)
     payer_phone = models.CharField(max_length=10)
@@ -14,18 +14,26 @@ class DirectPayment(models.Model):
     shipments = models.IntegerField()
     paid_amount = models.IntegerField()
     total_amount = models.IntegerField()
-    date_order_created = models.DateField(auto_now=True)
+    date_order_created = models.DateTimeField(auto_now_add=True)  
+    status = models.CharField(max_length=10, default="pending")
     is_payed = models.BooleanField(default=False)
-    is_canceled = models.BooleanField(default=False)
-
+   
     def save(self, *args, **kwargs):
-          current_day = datetime.now().isoformat()
-          if current_day > self.date_order_created.isoformat() + timedelta(minutes=3) and self.is_payed == False:
-               self.is_canceled = True
-               super().save(*args, **kwargs)
+        if self.date_order_created is None:
+            self.date_order_created = timezone.now()
+        if self.pk is not None:
+            # Prevent changes to date_order_created if it already exists
+            original = DirectPayments.objects.get(pk=self.pk)
+            self.date_order_created = original.date_order_created
+        current_time = timezone.now()
+        if not self.is_payed and current_time > self.date_order_created + timedelta(days=3):
+            self.status = "rejected"
+        elif self.is_payed:
+            self.status = "approved"
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.order}"
+        return f"Order#: {self.order}"
     
 class MercadoPagoPayment(models.Model):
     merchand_order = models.IntegerField()
@@ -46,7 +54,7 @@ class MercadoPagoPayment(models.Model):
     iva = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"{self.merchand_order}"
+        return f"payment: {self.payment_id}"
     
 
 class ItemsPayed(models.Model):
@@ -55,7 +63,7 @@ class ItemsPayed(models.Model):
     description = models.CharField(max_length=100)
     quantity = models.IntegerField()
     unit_price = models.IntegerField()
-    direct_payment = models.ForeignKey(DirectPayment, related_name="direct_payment", on_delete=models.CASCADE, null=True)
+    direct_payment = models.ForeignKey(DirectPayments, related_name="direct_payment", on_delete=models.CASCADE, null=True)
     mercadopago_payment = models.ForeignKey(MercadoPagoPayment, related_name="mercadopago_payment", on_delete=models.CASCADE, null=True)
 
     def __str__(self):
