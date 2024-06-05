@@ -1,0 +1,17 @@
+
+
+
+#comunidad-josram {
+    margin: 1rem auto 3rem auto;
+    padding: 2rem;
+    background-color: rgb(255, 255, 255);
+    justify-content: center;
+}
+
+.box-email {
+    margin: 1rem auto 3rem auto;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+
+}

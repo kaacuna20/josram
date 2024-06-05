@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+  {% load static %}
+
+  {% block title %}
+  JOSRAM - Todos los Productos
+  {% endblock %}
+
+  {% block css_files %}
+  <link rel="stylesheet" href="{% static 'clothes/all-products.css' %}"/>
+  <style>
+    /* Additional CSS for hover effects */
+    .hover-card {
+      position: relative;
+    }
+
+    .imagen-2 {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .hover-card:hover .imagen-2 {
+      opacity: 1;
+    }
+
+    .card img {
+      width: 100%;
+      height: auto;
+    }
+    #header {
+      margin: 1rem auto 1rem auto;
+      padding: 2rem;
+      background-color: rgb(247, 246, 246);
+      justify-content: center;
+  }
+  </style>
+  {% include 'clothes/includes/style.html' %}
+  {% endblock %}
+
+  {% block content %}
+  <section id="header">
+    <div>
+      <h1> Productos </h1>
+    </div>
+
+    {% include 'clothes/includes/header-filter.html' %}
+
+    <div class="filters mx-5">
+      <ul class="nav nav-pills">
+        {% if nav_colors %}
+        {% for color in nav_colors %}
+        <form action="{% url 'all-products' %}" method="POST">
+          {% csrf_token %}
+          <li class="nav-item dropdown mx-1">
+            <label class="badge bg-dark-subtle text-dark-emphasis rounded-pill">
+              <input type="hidden" value="{{ color }}" name="color">
+              {{color}}
+              <button type="submit" name="delete_color" class="btn-close" aria-label="Close"></button>
+            </label>
+          </li>
+        </form>
+        {% endfor %}
+        {% endif %}
+
+        {% if nav_prices %}
+        <form action="{% url 'all-products' %}" method="POST">
+          {% csrf_token %}
+          <li class="nav-item dropdown mx-1">
+            <label class="badge bg-dark-subtle text-dark-emphasis rounded-pill">
+              {% load custom_filters %}
+              <input type="hidden" value="{{ nav_prices }}" name="price">
+              {{nav_prices.0|currency}} - {{nav_prices.1|currency}}
+              <button type="submit" name="delete_price" class="btn-close" aria-label="Close"></button>
+            </label>
+          </li>
+        </form>
+        {% endif %}
+
+        {% if nav_prices or nav_colors %}
+        <form action="{% url 'all-products' %}" method="POST">
+          {% csrf_token %}
+          <li class="nav-item dropdown">
+            <button class="badge bg-dark-subtle text-dark-emphasis rounded-pill" type="submit" name="delete_filters">
+              Eliminar todos
+            </button>
+          </li>
+        </form>
+        {% endif %}
+      </ul>
+    </div>
+
+    <div class="album py-5 bg-body-tertiary">
+      <div class="container">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+          {% if page_obj %}
+          <!-- Display pagination controls -->
+          {% for clothe in page_obj.object_list %}
+          <div class="col">
+            <div class="card shadow-sm">
+              <a href="{% url 'clothes-details' clothe.clothes.slug %}">
+                <div class="hover-card">
+                  <img src="{{ clothe.main_image.url }}" class="card-img-top imagen-1" alt="{{ clothe.clothes.name }}">
+                  <img src="{{ clothe.model_image_1.url }}" class="card-img-top imagen-2" alt="{{ clothe.clothes.name }}">
+                </div>
+                <div class="card-body">
+                  <p class="card-text">{{ clothe.clothes.name|title }}</p>
+                </a>
+                <div class="d-flex justify-content-between align-items-center">
+                  {% load custom_filters %}
+                  <p class="text-body-secondary">{{ clothe.clothes.price|currency }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+          {% else %}
+          <div>
+            <h1>No se encontraron elementos a tu búsqueda!</h1>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <section id="pagination">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+          </li>
+          {% endif %}
+  
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.number }}">{{ page_obj.number }}</a>
+          </li>
+  
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </section>
+  </section>
+
+ 
+
+
+  {% endblock %}
+      
+        
+
+
+
+
+
+
+
+
+
+

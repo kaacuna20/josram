@@ -1,0 +1,524 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{{clothe_details.name|title}}
+{% endblock %}
+
+
+{% block css_files %}
+<link rel="stylesheet" href="{% static "clothes/clothes-details.css" %}"/>
+<link rel="stylesheet" href="{% static "clothes/comments.css" %}"/>
+<style>
+    
+    .miniaturas {
+        list-style-type: none;  # Quitar viñetas
+        padding: 0;
+        display: flex;  # Mostrar en fila
+    }
+
+    .miniaturas li {
+        margin-right: 10px;  # Espacio entre miniaturas
+        cursor: pointer;  # Cambia el cursor para indicar que es clicable
+    }
+
+    #quantity input {
+        background: transparent;
+        border-radius:25px;
+        text-transform: uppercase;
+        font-weight: bold;
+        width: 100px;
+        margin: 0 auto;
+        text-align: center
+    }
+
+    .card.size-image-small img {
+      
+        object-fit: cover;
+    }
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        padding-top: 60px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.9);
+    }
+
+    .modal-content {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+    }
+
+    .close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #fff;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: #bbb;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+        .miniaturas {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .miniaturas li {
+            margin-bottom: 10px;
+        }
+
+        .col-md-5 {
+            margin-left: 0;
+        }
+    }
+
+    /* Adjust the size of the images */
+    .card.size-image-small img {
+        width: 100%; /* Make the images fill the entire width of their container */
+        height: auto; /* Maintain aspect ratio */
+    }
+
+    /* Adjust the size of the columns */
+    .col {
+        flex: 0 0 auto; /* Allow the columns to shrink or grow as needed */
+        width: 25%; /* Each column occupies 25% of the row's width */
+    }
+
+    /* Adjust spacing between columns */
+    .col:not(:last-child) {
+        margin-right: 10px; /* Add some margin between columns */
+    }
+
+    /* Adjust spacing around the section */
+    #details {
+        padding: 0.5rem; /* Add padding to the section */
+    }
+
+    .featurette .col-md-5 {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 700px; /* Adjust this height as needed */
+        overflow: auto;
+      }
+
+    .featurette .col-md-5::-webkit-scrollbar {
+        display: none; /* Hide scrollbar for WebKit browsers */
+      }
+    
+      .featurette .col-md-5 {
+        -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
+        scrollbar-width: none;  /* Hide scrollbar for Firefox */
+      }
+
+      .details-content {
+        flex-grow: 1;
+        overflow-y: auto;
+      }
+    
+      .py-2 {
+        margin-top: 10px;
+      }
+
+      
+#comments {
+    margin: 3rem auto 3rem auto;
+    padding: 0rem;
+    background-color: white;
+    justify-content: center;
+}
+
+.text-justify {
+    text-align: justify;
+}
+
+.size-image-small {
+    width: 100%;
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    .btn {
+        width: 100% !important;
+    }
+}
+
+.quantity-input input[type="number"] {
+    width: 40px; /* Adjust width as needed */
+    text-align: center; /* Center the text */
+    border: 0px solid #ced4da;
+    readonly;
+}
+
+.quantity-input input[type="number"]::-webkit-inner-spin-button,
+.quantity-input input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0; /* Optional: remove the margin */
+    display: none; /* Hide the default spin buttons */
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section id="details">
+    <div class="row featurette" style="justify-content: center; margin: 0 0.5rem 0 0.5rem;">
+        <div class="col-md-5 order-md-1 justify-content-center align-items-center">
+            <img id="main-image" src="{{ size_clothes.color_clothe.main_image.url }}" class="card-img-top" alt="..." onclick="openModal()">
+            <div id="carouselExampleIndicators" class="carousel slide">
+                <div class="carousel-inner d-flex">
+                    {% for photo in color_clothes %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <ul class="miniaturas">
+                            <div class="row pt-3">
+                                <div class="col-3">
+                                    <div class="card size-image-small">
+                                        <img src="{{ photo.main_image.url }}" class="card-img-top" alt="{{ clothe_details.name }}-{{ photo.color }}-1" style="cursor: pointer;" onclick="showImage('{{ photo.main_image.url }}')">
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="card size-image-small">
+                                        <img src="{{ photo.model_image_1.url }}" class="card-img-top" alt="{{ clothe_details.name }}-{{ photo.color }}-2" style="cursor: pointer;" onclick="showImage('{{ photo.model_image_1.url }}')">
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="card size-image-small">
+                                        <img src="{{ photo.model_image_2.url }}" class="card-img-top" alt="{{ clothe_details.name }}-{{ photo.color }}-3" style="cursor: pointer;" onclick="showImage('{{ photo.model_image_2.url }}')">
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="card size-image-small">
+                                        <img src="{{ photo.other_image.url }}" class="card-img-top" alt="{{ clothe_details.name }}-{{ photo.color }}-4" style="cursor: pointer;" onclick="showImage('{{ photo.other_image.url }}')">
+                                    </div>
+                                </div>
+                            </div>
+                        </ul>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div id="imageModal" class="modal" onclick="closeModal()">
+            <span class="close">&times;</span>
+            <img class="modal-content" id="modal-image">
+        </div>
+
+        <div class="col-md-5 order-md-1 mx-auto pt-3">
+            <div>
+                <span>JOSRAM</span>
+                <h2>{{ clothe_details.name|title }}</h2>
+            </div>
+           
+
+            <div class="py-0">
+                {% load custom_filters %}
+                <h4 class="lead"> {{ clothe_details.price|currency }} COP 
+                   
+                {% if not size_clothes.in_stock %}
+                <span class="span-stock">Agotado</span></h4>
+                {% endif %}
+            </div>
+            <small class="my-0 py-0">Los <a href="{% url 'shipments'%}">gastos de envío</a> se calculan en la pantalla de pago</small>
+            <div class="py-2">
+                <form action="{% url 'clothes-details' clothe_details.slug %}" method="POST">
+                    {% csrf_token %}
+                    <h4 class="mt-0">{{ form.size.label_tag }}</h4>
+                    <!-- Mostrar las opciones de tallas -->
+                    <div>
+                        {% for radio in form.size %}
+                        <label class="radio-inline btn btn-color btn-outline-dark rounded-pill px-3">
+                            {{ radio }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <h4 class="mt-2">{{ form.color.label_tag }}</h4>
+                    <!-- Mostrar las opciones de colores -->
+                    <div>
+                        {% for radio in form.color %}
+                        <!--<label class="radio-hidden btn btn-color btn-outline-dark rounded-pill px-3 {% if radio.errors %} errors {% endif %}">
+
+                        <input type="submit" value="{{ radio.value }}" name="verify">{{ radio }}
+                    </label>-->
+                        <label class="radio-hidden btn btn-color btn-outline-dark rounded-pill px-3 {% if radio.errors %} errors {% endif %}">
+                            {{ radio }}
+                            {{ radio.errors }}
+                        </label>
+                        {% endfor %}
+                    </div>
+
+                    <div class="py-2 d-flex align-items-center">
+                        <button type="submit" name="verify" class="btn btn-dark" id="decrement-btn">-</button>
+                        <div class="quantity-input" id="quantity">
+                            {{ form.cant }}
+                        </div>
+                        <button type="submit" name="verify" class="btn btn-dark" id="increment-btn">+</button>
+                    </div>
+                
+                    
+                    {% if not is_enough %}
+                    <span style="font-style: italic;">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <svg style="color:red;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+                        </svg>
+                        No puedes agregar más {{ clothe_details.name|title }} a la compra.
+                    </span>
+                    {% else %}
+                    <span style="font-style: italic;">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2-circle" viewBox="0 0 16 16" style="color:green">
+                            <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0"/>
+                            <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
+                        </svg>
+                        Hay {{ clothe_details.name|title }} disponible!
+                    </span>
+                    {% endif %}
+                  
+                </form>
+
+                {% if not added_cart %}
+                <span style="font-style: italic;">
+                    <i class="bi bi-exclamation-circle"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bag-plus-fill" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M10.5 3.5a2.5 2.5 0 0 0-5 0V4h5zm1 0V4H15v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V4h3.5v-.5a3.5 3.5 0 1 1 7 0M8.5 8a.5.5 0 0 0-1 0v1.5H6a.5.5 0 0 0 0 1h1.5V12a.5.5 0 0 0 1 0v-1.5H10a.5.5 0 0 0 0-1H8.5z"/>
+                    </svg>
+                    Se agregó {{ clothe_details.name|title }} al carrito.
+                </span>
+                {% endif %}
+
+                {% if messages %}
+                <script>
+                    // JavaScript to show pop-up based on messages
+                    {% for message in messages %}
+                        // Display a pop-up/modal using Bootstrap or custom JS
+                        alert("{{ message }}"); // Example: using a simple JavaScript alert
+                    {% endfor %}
+                </script>
+                {% endif %}
+
+                {% if not is_enough or not size_clothes.in_stock %}
+                <div class="py-2 text-center">
+                    <button type="submit" name="proceed_to_checkout" class="btn btn-outline-dark rounded-pill mt-2 w-100 disabled">Sin stock</button>
+                </div>
+                <div class="py-2 text-center">
+                    <button type="submit" name="add_to_cart" class="btn btn-dark rounded-pill w-100 disabled">Agregar al carrito</button>
+                </div>
+                {% else %}
+                <form action="{% url 'cheackout-buy' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="py-2 text-center">
+                        <input type="hidden" value="{{ form.cant.value }}" name="sizes_clothes_cant">
+                        <input type="hidden" value="{{ size_clothes.pk }}" name="sizes_clothes_pk">
+                        <button type="submit" name="proceed_to_checkout" class="btn btn-outline-dark rounded-pill mt-2 w-100">Ir a comprar</button>
+                    </div>
+                </form>
+                <form action="{% url 'your-cart' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="py-2 text-center">
+                        <input type="hidden" value="{{ form.cant.value }}" name="sizes_clothes_cant">
+                        <input type="hidden" value="{{ size_clothes.pk }}" name="sizes_clothes_pk">
+                        <button type="submit" name="add_to_cart" class="btn btn-dark rounded-pill w-100">Agregar al carrito</button>
+                    </div>
+                </form>
+                {% endif %}
+
+                <div class="py-2">
+                    <p class="text-justify" style="font-family: 'Lato', sans-serif;">
+                        {{ clothe_details.description }}
+                    </p>
+                </div>
+
+                <div class="py-2"> <!-- Adjust padding here -->
+                    <button type="button" class="btn btn-outline-dark" id="shareBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
+                            <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5m-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3"></path>
+                        </svg>
+                        Compartir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="comments">
+    <div class="accordion" id="accordionComments">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="font-weight: bold;">
+                    Dejar una reseña
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionComments">
+                <div class="accordion-body">
+                    <form action="{% url "clothes-details" clothe_details.slug %}" method="POST">
+                        {% csrf_token %}
+                        {% for form_field in comment_form %}
+                        <div class="form-control {% if form_field.errors %} errors {% endif %}" >
+                            {{form_field.label_tag }}
+                            {{ form_field }}
+                            {{ form_field.errors }}
+                        </div>
+                        {% endfor %}
+                        <button class="btn btn-secondary mt-2 mx-2">Comentar</button>  
+                    </form>
+                </div>     
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion mt-3" id="accordionCommentsReviews">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseReviews" aria-expanded="true" aria-controls="collapseReviews" style="font-weight: bold;">
+                    Reseñas de Clientes
+                </button>
+            </h2>
+            <div id="collapseReviews" class="accordion-collapse collapse show" data-bs-parent="#accordionCommentsReviews">
+                <div class="accordion-body">
+                    <div class="my-3 p-3 bg-body rounded shadow-sm">
+                        <h5 class="border-bottom pb-2 mb-2">Reseñas</h5>
+                        {% if comments %}
+                        {% for comment in comments %}
+                        <div class="pb-3 mb-0 small lh-sm border-bottom w-100 mt-2 mb-0 py-0">
+                            <div class="row">
+                                <div class="col-lg-2 mx-0 py-0 d-flex flex-column align-items-center">
+                                    <p style="font-size: 32px; font-weight: 700; margin-bottom: 0; margin-left: 15px;" class="align-items-center">
+                                        {{ comment.rating }}.0
+                                        <div>{{ comment.get_rating_display }}</div>
+                                    </p>
+                                </div>
+                                <div class="col-lg-8">
+                                    <div class="d-flex justify-content-between">
+                                        <strong class="text-gray-dark mx-0" style="font-size: 20px;">@{{comment.user_name}}</strong>
+                                    </div>
+                                    <span class="d-block mt-1 mx-0">{{ comment.comment}}</span>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="d-flex justify-content-between mx-3">
+                                        <p>{{ comment.date|date:"d/m/Y"}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <h5 class="pb-2 mb-2">No hay reseñas hasta el momento!</h5>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% include "clothes/follow.html" %}
+<script>
+    function changeImage(src) {
+        document.getElementById("main-image").src = src;  # Cambia el src de la imagen grande
+    }
+</script>
+<!-- JavaScript para mantener la selección  
+                -->
+
+    <script>
+        function showImage(url) {
+            document.getElementById('main-image').src = url;
+          }
+        
+          function openModal() {
+            document.getElementById('imageModal').style.display = "block";
+            document.getElementById('modal-image').src = document.getElementById('main-image').src;
+          }
+        
+          function closeModal() {
+            document.getElementById('imageModal').style.display = "none";
+          }
+    </script>
+
+    <script>
+        document.getElementById('shareBtn').addEventListener('click', () => {
+            if (navigator.share) {
+                navigator.share({
+                    title: '{{ post.title }}',
+                    url: window.location.href
+                }).then(() => {
+                    console.log('Thanks for sharing!');
+                }).catch(console.error);
+            } else {
+                console.log('Web Share API not supported');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const decrementBtn = document.getElementById('decrement-btn');
+            const incrementBtn = document.getElementById('increment-btn');
+            const quantityInput = document.getElementById('{{ form.cant.auto_id }}');
+        
+            decrementBtn.addEventListener('click', function() {
+                if (parseInt(quantityInput.value) > 1) {
+                    quantityInput.value = parseInt(quantityInput.value) - 1;
+                }
+            });
+        
+            incrementBtn.addEventListener('click', function() {
+                quantityInput.value = parseInt(quantityInput.value) + 1;
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const forms = document.querySelectorAll("form");
+            forms.forEach(form => {
+                form.addEventListener("submit", function(event) {
+                    const scrollPos = window.scrollY || document.documentElement.scrollTop;
+                    const input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = "scrollPos";
+                    input.value = scrollPos;
+                    form.appendChild(input);
+                });
+            });
+        
+            // Scroll to the position from the URL parameter if it exists
+            const urlParams = new URLSearchParams(window.location.search);
+            const scrollPos = urlParams.get("scrollPos");
+            if (scrollPos) {
+                window.scrollTo(0, parseInt(scrollPos));
+            }
+        });
+    </script>
+
+<!-- JavaScript para el desplazamiento del carrusel -->
+
+
+
+{% endblock %}
+
