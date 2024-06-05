@@ -16,7 +16,7 @@ def send_email(subject:str, template:str, destination:str, context:dict):
             "sum_prices": context["sum_prices"],
             "cost_shipments": context["cost_shipments"]
         }
-    sender_email = os.getenv['JOSRAM_EMAIL']
-    recipient_emails = [os.getenv['JOSRAM_EMAIL'], destination]
+    sender_email = os.getenv('JOSRAM_EMAIL')
+    recipient_emails = [os.getenv('JOSRAM_EMAIL'), destination]
     html_message = render_to_string(template_name, context)
     send_mail(subject, '', sender_email, recipient_emails, html_message=html_message)

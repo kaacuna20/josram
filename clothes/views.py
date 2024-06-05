@@ -287,8 +287,6 @@ class ClothesByGender(View):
         # Order the QuerySet
         gender_clothes = gender_clothes.order_by(items_order)
 
-        
-        
         len_cart = 0
         if self.request.session.get("cart_clothes") is not None:
             len_cart = len(self.request.session.get("cart_clothes"))
@@ -424,14 +422,14 @@ def clothe_details(request, slug):
     added_cart = True
     default_size = form.fields["size"].initial
     default_color = form.fields["color"].initial
-    size_clothes = SizeClothes.objects.get(color_clothe__clothes__slug=slug, color_clothe__color=default_color, size=default_size)
+    sizes_clothes = SizeClothes.objects.get(color_clothe__clothes__slug=slug, color_clothe__color=default_color, size=default_size)
     is_enough = True
 
     len_cart = 0
     if request.session.get("cart_clothes") is not None:
         len_cart = len(request.session.get("cart_clothes"))
     
-    if int(form.fields["cant"].initial) > size_clothes.cant:
+    if int(form.fields["cant"].initial) > sizes_clothes.cant:
         is_enough = False
     
     if request.method == 'POST':
@@ -441,9 +439,11 @@ def clothe_details(request, slug):
             post_color = request.POST["color"]
             post_size = request.POST["size"]
             post_cant = int(request.POST["cant"])
-            if "verify" in request.POST:
+            if "verify" in request.POST or "size" in request.POST or "color" in request.POST:
                 try:
-                    sizes_clothes = SizeClothes.objects.get(color_clothe__clothes__slug=slug, color_clothe__color=post_color, size=post_size )
+                    #sizes_clothes = SizeClothes.objects.get(color_clothe__clothes__slug=slug, color_clothe__color=post_color, size=post_size )
+                    sizes_clothes = SizeClothes.objects.get(size=post_size, color_clothe__clothes__slug=slug, color_clothe__color=post_color)
+                    
                     if  post_cant > sizes_clothes.cant:
                         is_enough = False
                 
@@ -451,19 +451,7 @@ def clothe_details(request, slug):
                     sizes_clothes = None
                     is_enough = False
 
-            context = {
-                    "color_clothes": color_clothes,
-                    "clothe_details": clothe_select,
-                    "form": form,
-                    "is_enough": is_enough,
-                    "comment_form": comment_form,
-                    "comments": clothe_select.comments.all().order_by("-date"),
-                    "size_clothes": sizes_clothes,
-                    "number": len_cart,
-                    "added_cart": added_cart
-                }
-                    
-            return render(request, "clothes/clothes-details.html", context)
+            
        
         elif "comment" in request.POST:
             comment_form = CommentForm(request.POST)
@@ -472,9 +460,9 @@ def clothe_details(request, slug):
                 comment = comment_form.save(commit=False)
                 comment.clothes = clothe_select
                 comment.save()
-                return HttpResponseRedirect(f"clothe/{slug}?scrollPos={scroll_pos}")
+                return HttpResponseRedirect(f"{slug}?scrollPos={scroll_pos}")
           
-        
+    
     context = {
             "color_clothes": color_clothes,
             "clothe_details": clothe_select,
@@ -482,7 +470,7 @@ def clothe_details(request, slug):
             "is_enough": is_enough,
             "comment_form": comment_form,
             "comments": clothe_select.comments.all().order_by("-date"),
-            "size_clothes": size_clothes,
+            "size_clothes": sizes_clothes,
             "number": len_cart,
             "added_cart": added_cart
         }

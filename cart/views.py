@@ -283,7 +283,7 @@ class ReferenceView(View):
         expiration_date_from = datetime.now()
         expiration_date_to = expiration_date_from + timedelta(days=3)
       
-        sdk = mercadopago.SDK(os.getenv['MERCADOPAGO_ACCESS_TOKEN'])
+        sdk = mercadopago.SDK(os.getenv('MERCADOPAGO_ACCESS_TOKEN'))
         # Crea un ítem en la preferencia
         preference_data = {
             "auto_return": "approved",
@@ -359,7 +359,7 @@ def supend(request):
 @csrf_exempt
 @require_POST
 def notificate(request):
-    sdk = mercadopago.SDK(os.getenv['MERCADOPAGO_ACCESS_TOKEN'])
+    sdk = mercadopago.SDK(os.getenv('MERCADOPAGO_ACCESS_TOKEN'))
     
     # Extract query parameters
     topic = request.GET.get("type")
