@@ -15,27 +15,41 @@ from blog.models import Post
 # Create your views here.
 
 
+from django.views.generic import ListView, TemplateView
+from .models import ImageClothes
 
-
-class StartPageView(ListView):
-    template_name = "clothes/index.html"
-    model = ImageClothes
-    context_object_name = "clothes"
+class FollowInstagram(ListView):
+    template_name = "clothes/follow.html"
+    context_object_name = "instagram_clothes"
 
     def get_queryset(self):
-        querySet = super().get_queryset()
-        data = querySet[:4]
-        return data
-    
+        return ImageClothes.objects.filter(in_instagram=True)[:8]
+
+class StartPageView(TemplateView):
+    template_name = "clothes/index.html"
+
     def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Query for the first view
+        clothes_queryset = ImageClothes.objects.all()[:4]
+        context["clothes"] = clothes_queryset
+
+        # Add FollowInstagram context
+        follow_instagram_view = FollowInstagram()
+        follow_instagram_context = follow_instagram_view.get_context_data(object_list=follow_instagram_view.get_queryset())
+        context.update(follow_instagram_context)
+
+        # Handle session data
         len_cart = 0
         if self.request.session.get("cart_clothes") is not None:
             len_cart = len(self.request.session.get("cart_clothes"))
-
-        context = super().get_context_data(**kwargs)
         context["number"] = len_cart
+
         return context
 
+    
+    
 class AllProducts(View):
   
     def get(self, request):
@@ -424,6 +438,11 @@ def clothe_details(request, slug):
     default_color = form.fields["color"].initial
     sizes_clothes = SizeClothes.objects.get(color_clothe__clothes__slug=slug, color_clothe__color=default_color, size=default_size)
     is_enough = True
+    
+    # Fetch Instagram clothes data
+    follow_instagram_view = FollowInstagram()
+    instagram_clothes = follow_instagram_view.get_queryset()
+    
 
     len_cart = 0
     if request.session.get("cart_clothes") is not None:
@@ -472,11 +491,12 @@ def clothe_details(request, slug):
             "comments": clothe_select.comments.all().order_by("-date"),
             "size_clothes": sizes_clothes,
             "number": len_cart,
-            "added_cart": added_cart
+            "added_cart": added_cart,
+            "instagram_clothes": instagram_clothes,
         }
     return render(request, "clothes/clothes-details.html", context)
     
-
+#context.update()
 
 
 

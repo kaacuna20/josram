@@ -28,7 +28,7 @@ class CommentAdmin(admin.ModelAdmin):
 
 class ImageClothesAdmin(admin.ModelAdmin):
     list_display = ('color', 'clothes',)
-    list_filter = ("clothes", )
+    list_filter = ("clothes", 'in_instagram')
 
 class SizeClothesAdmin(admin.ModelAdmin):
      list_display = ('size', 'cant', 'color_clothe', 'clothes')

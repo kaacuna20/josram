@@ -7,19 +7,19 @@
 
 
 {% block css_files %}
-<link rel="stylesheet" href="{% static "clothes/clothes-details.css" %}"/>
-<link rel="stylesheet" href="{% static "clothes/comments.css" %}"/>
+<link rel="stylesheet" href="{% static 'clothes/clothes-details.css' %}"/>
+<link rel="stylesheet" href="{% static 'clothes/comments.css' %}"/>
 <style>
     
     .miniaturas {
-        list-style-type: none;  # Quitar viñetas
+        list-style-type: none;  /*  Quitar viñetas*/
         padding: 0;
-        display: flex;  # Mostrar en fila
+        display: flex;  /*  Mostrar en fila*/
     }
 
     .miniaturas li {
-        margin-right: 10px;  # Espacio entre miniaturas
-        cursor: pointer;  # Cambia el cursor para indicar que es clicable
+        margin-right: 10px;  /*  Espacio entre miniaturas*/
+        cursor: pointer;  /*  Cambia el cursor para indicar que es clicable*/
     }
 
     #quantity input {
@@ -164,7 +164,6 @@
     width: 40px; /* Adjust width as needed */
     text-align: center; /* Center the text */
     border: 0px solid #ced4da;
-    readonly;
 }
 
 .quantity-input input[type="number"]::-webkit-inner-spin-button,

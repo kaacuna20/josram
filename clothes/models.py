@@ -42,6 +42,8 @@ class ImageClothes(models.Model):
      model_image_1 = models.ImageField(upload_to="clothes", null=True)
      model_image_2 = models.ImageField(upload_to="clothes", null=True)
      other_image = models.ImageField(upload_to="clothes", null=True)
+     in_instagram = models.BooleanField(default=False)
+     url_instagram = models.URLField(unique=True, null=True)
      clothes = models.ForeignKey(Clothes, related_name="Colors", on_delete=models.CASCADE, null=True)
 
      def __str__(self):
