@@ -24,7 +24,9 @@ This project I choosed Django because the schema and panel admin is going to be 
 - [Project Structure](#Project-Structure)
 - [Directory and File Descriptionsn](#Directory-and-File-Descriptions)
 - [Getting Started](#Getting-Started)
-
+- [Configuration](#Configuration)
+- [Integrating MercadoPago Checkout Pro](#Integrating-MercadoPago-Checkout-Pro)
+  
 ## Project Structure
 ```ini
 josram/
@@ -142,6 +144,21 @@ josram/
 └── .env
 ```
 
+## Configuration
+
+Create a `.env` file in the root directory of your project with the following variables:
+
+```ini
+# .env file
+SECRET_KEY=JOSRAM_SECRET_KEY
+EMAIL_PASSWORD=JOSRAM_PASSWORD_APP
+JOSRAM_EMAIL=JOSRAM_EMAIL_APP
+TWILIO_ACCOUNT_SID=JOSRAM_TWILIO_ACCOUNT_SID
+TWILIO_AUTH_TOKEN=JOSRAM_TWILIO_AUTH_TOKEN
+JOSRAM_NUMBER=JOSRAM_NUMBER_PHONE
+MERCADOPAGO_ACCESS_TOKEN=YOUR_ACCESS_TOKEN
+```
+
 ## Directory and File Descriptions
 
 - `static/`: Contains static files such as CSS and images used across the entire project.
@@ -241,3 +258,169 @@ josram/
    ```
 8. **Start the development server**:
  - Open your web browser and go to http://localhost:8000.
+
+## Integrating MercadoPago Checkout Pro
+
+This website, offer payment method using mercadopago to online payment, and I integrated the SDK that is a solution that allows your customers to make purchases through Mercado Pago payment pages safely, quickly and with the possibility of paying with the main payment methods currently available. 
+
+I share the documentation: https://www.mercadopago.com.co/developers/es/docs/checkout-pro/landing
+
+Step 1: Install the MercadoPago SDK
+- Add the MercadoPago SDK to your `requirements.txt` file.
+
+Step 2: Configure MercadoPago
+- Add your MercadoPago credentials to the `.env` file.
+
+Step 3: Create a Payment View
+- In your `cart` app, create a view to handle the payment process. For example, in `cart/views.py`.
+
+```ini
+import mercadopago
+import os
+from django.shortcuts import render, redirect
+from django.conf import settings
+
+class ReferenceView(View):
+    @csrf_exempt
+    def post(self, request):
+        # Get the id that are in the cart
+        stored_clothes = request.session.get("cart_clothes")
+        cart_mercadopago = []
+        for clothe in stored_clothes:
+            quantity = clothe["cant"]
+            clothe_stored = SizeClothes.objects.get(pk=clothe["id"])
+            cart_mercadopago.append({
+                "id": f"Item-ID-{clothe_stored.pk}",
+                "title": clothe_stored.color_clothe.clothes.name,
+                "description": f"Talla {clothe_stored.size} de color {clothe_stored.color_clothe.color}",
+                "unit_price": clothe_stored.color_clothe.clothes.price,
+                "currency_id": "COP",
+                "quantity": quantity,
+            })
+
+        expiration_date_from = datetime.now()
+        expiration_date_to = expiration_date_from + timedelta(days=3)
+      
+        sdk = mercadopago.SDK(os.getenv('MERCADOPAGO_ACCESS_TOKEN'))
+        # Crea un ítem en la preferencia
+        preference_data = {
+            "auto_return": "approved",
+
+            "items": cart_mercadopago,
+
+            "installments": 1,
+            "default_installments": 1,
+
+            "payer": {
+                "name": request.POST.get("name"),
+                "surname": request.POST.get("lastname"),
+                "email": request.POST.get("email"),
+                "phone": {
+                    "area_code": "57",
+                    "number": request.POST.get("contact")
+                },
+                "address": {
+                    "street_name": request.POST.get("address"),
+                    
+                    "zip_code": request.POST.get("zip_code")
+                }
+            },
+
+            "receiver_address": {
+			"zip_code": request.POST.get("zip_code"),
+			"street_name": request.POST.get("address"),
+			"apartment": request.POST.get("home"),
+		},
+            "back_urls": {
+                "success": "https://b75b-190-84-119-237.ngrok-free.app/cart/success",
+                "failure": "https://b75b-190-84-119-237.ngrok-free.app/cart/failure",
+                "pending": "https://b75b-190-84-119-237.ngrok-free.app/cart/pending"
+            },
+
+             "excluded_payment_methods": [
+                    { "id": "efecty" }
+                ],
+                "excluded_payment_types": [
+                    { "id": "ticket" }
+                ],
+          
+            
+            "binary_mode": True,
+            "shipments":{
+            "cost": int(request.POST.get("cost_shipments")),
+            "mode": "not_specified",
+            },
+            "statement_descriptor": "Compra en JOSRAM",
+            "notification_url": f"https://b75b-190-84-119-237.ngrok-free.app/cart/notification",
+         
+            "expires": True,
+            "expiration_date_from": f"{expiration_date_from.isoformat()}",
+            "expiration_date_to": f"{expiration_date_to.isoformat()}"
+        }
+        
+        preference_response = sdk.preference().create(preference_data)
+        if preference_response.get("status") != 201:
+            return JsonResponse(preference_response, status=preference_response.get("status", 400))
+        preference = preference_response["response"]
+    
+        return HttpResponseRedirect(f"{preference['init_point']}")
+```
+
+Step 4: Add URLs
+Add a URL pattern for the new payment view in `cart/urls.py`:
+```ini
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("payment-methods", views.ReferenceView.as_view(), name="mercadopago-payment"),
+    # other paths...
+]
+```
+
+Step 5: Update Templates
+Update your checkout.html template to include the MercadoPago checkout button:
+```ini
+
+<form id="payment-form" class="needs-validation" method="POST" action="{% url 'mercadopago-payment' %}" novalidate>
+          {% csrf_token %}
+	# elements of form...
+
+<button id="checkout-button" class="w-100 btn btn-primary btn-lg mt-5" type="submit" style="background-color:black;">Ir a pagar</button>
+</form>
+<script>
+  document.getElementById('payment-form').addEventListener('submit', function (e) {
+    var form = this;
+    var mercadopagoRadio = document.getElementById('mercadopagoRadio');
+    var directRadio = document.getElementById('directRadio');
+    if (mercadopagoRadio.checked) {
+      form.action = "{% url 'mercadopago-payment' %}";
+    } else if (directRadio.checked) {
+      form.action = "{% url 'direct-payment' order_josram %}";
+    }
+  });
+</script>
+```
+
+Step 6: Handle Payment Responses
+Create views to handle success, failure, and pending payment responses in `cart/views.py`:
+
+```ini
+
+def payment_success(request):
+    return render(request, 'cart/success.html')
+
+def payment_failure(request):
+    return render(request, 'cart/failure.html')
+
+def payment_pending(request):
+    return render(request, 'cart/pending.html')
+```
+And add corresponding URLs in `cart/urls.py`:
+
+```ini
+    path("success", views.success),
+    path("failure", views.failure),
+    path("pending", views.supend),
+```
+Now your project is set up to handle payments using MercadoPago's Checkout Pro. Be sure to test the integration thoroughly before going live.
