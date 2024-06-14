@@ -274,6 +274,30 @@ Step 2: Configure MercadoPago
 Step 3: Create a Payment View
 - In your `cart` app, create a view to handle the payment process. For example, in `cart/views.py`.
 
+Step 3: Set Up ngrok for HTTPS Connection
+To enable HTTPS for your local development environment, use ngrok. ngrok exposes your local server to the internet securely.
+1. Install ngrok:
+    Download and install ngrok from ngrok.com.
+2. Start ngrok:
+    Run ngrok on the port your Django server is running on (usually 8000):
+```ini
+ngrok http 8000
+```
+3. Update Callback URLs:
+   Copy the generated HTTPS URL from ngrok and use it to update the callback URLs in your code.
+   
+Step 4: Create a Test Seller Account in MercadoPago
+To test your integration, create a test seller account in MercadoPago:
+
+1. Create Test Users:
+    Go to the MercadoPago Developers site and create test users. This will give you both seller and buyer test accounts.
+
+2. Use Production Credentials:
+    Ensure you have the production MercadoPago credentials for API testing.
+
+Step 5: Create a Payment View
+In your `cart` app, create a view to handle the payment process. For example, in `cart/views.py`:
+
 ```ini
 import mercadopago
 import os
@@ -366,7 +390,7 @@ class ReferenceView(View):
         return HttpResponseRedirect(f"{preference['init_point']}")
 ```
 
-Step 4: Add URLs
+Step 6: Add URLs
 Add a URL pattern for the new payment view in `cart/urls.py`:
 ```ini
 from django.urls import path
@@ -378,7 +402,7 @@ urlpatterns = [
 ]
 ```
 
-Step 5: Update Templates
+Step 7: Update Templates
 Update your checkout.html template to include the MercadoPago checkout button:
 ```ini
 
@@ -402,7 +426,7 @@ Update your checkout.html template to include the MercadoPago checkout button:
 </script>
 ```
 
-Step 6: Handle Payment Responses
+Step 8: Handle Payment Responses
 Create views to handle success, failure, and pending payment responses in `cart/views.py`:
 
 ```ini
@@ -423,4 +447,16 @@ And add corresponding URLs in `cart/urls.py`:
     path("failure", views.failure),
     path("pending", views.supend),
 ```
-Now your project is set up to handle payments using MercadoPago's Checkout Pro. Be sure to test the integration thoroughly before going live.
+Step 9: Test Your Integration
+1. Start your Django server:
+```ini
+python manage.py runserver
+```
+2. Start ngrok:
+```ini
+ngrok http 8000
+```
+3. Test with MercadoPago's Test User:
+    Use the test buyer account created earlier to simulate a purchase.
+   
+Now project is set up to handle payments using MercadoPago's Checkout Pro. Be sure to test the integration thoroughly before going live.
