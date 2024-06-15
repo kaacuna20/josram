@@ -157,6 +157,7 @@ TWILIO_ACCOUNT_SID=JOSRAM_TWILIO_ACCOUNT_SID
 TWILIO_AUTH_TOKEN=JOSRAM_TWILIO_AUTH_TOKEN
 JOSRAM_NUMBER=JOSRAM_NUMBER_PHONE
 MERCADOPAGO_ACCESS_TOKEN=YOUR_ACCESS_TOKEN
+HTTPS_PROXY=NGROK_HTTPS_URL
 ```
 
 ## Directory and File Descriptions
@@ -356,9 +357,9 @@ class ReferenceView(View):
 			"apartment": request.POST.get("home"),
 		},
             "back_urls": {
-                "success": "https://b75b-190-84-119-237.ngrok-free.app/cart/success",
-                "failure": "https://b75b-190-84-119-237.ngrok-free.app/cart/failure",
-                "pending": "https://b75b-190-84-119-237.ngrok-free.app/cart/pending"
+                "success": f"https://{os.getenv('HTTPS_PROXY')}/cart/success",
+                "failure": f"https://{os.getenv('HTTPS_PROXY')}/cart/failure",
+                "pending": f"https://{os.getenv('HTTPS_PROXY')}/cart/pending"
             },
 
              "excluded_payment_methods": [
@@ -375,7 +376,7 @@ class ReferenceView(View):
             "mode": "not_specified",
             },
             "statement_descriptor": "Compra en JOSRAM",
-            "notification_url": f"https://b75b-190-84-119-237.ngrok-free.app/cart/notification",
+            "notification_url": f"https://{os.getenv('HTTPS_PROXY')}/cart/notification",
          
             "expires": True,
             "expiration_date_from": f"{expiration_date_from.isoformat()}",
