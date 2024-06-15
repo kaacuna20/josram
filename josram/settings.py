@@ -32,11 +32,11 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'b75b-190-84-119-237.ngrok-free.app'
+    os.getenv('HTTPS_PROXY')
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://b75b-190-84-119-237.ngrok-free.app',  # Replace with your actual Ngrok URL
+    f'https://{os.getenv('HTTPS_PROXY')}',  # Replace with your actual Ngrok URL
     # Add other trusted origins if needed
 ]
 
