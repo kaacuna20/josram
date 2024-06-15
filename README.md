@@ -26,6 +26,7 @@ This project I choosed Django because the schema and panel admin is going to be 
 - [Getting Started](#Getting-Started)
 - [Configuration](#Configuration)
 - [Directory and File Descriptions](#Directory-and-File-Descriptions)
+- [Getting Started](#Getting-Started)
 - [Integrating MercadoPago Checkout Pro](#Integrating-MercadoPago-Checkout-Pro)
   
 ## Project Structure
