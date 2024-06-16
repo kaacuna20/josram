@@ -11,7 +11,7 @@ class DirectPaymentAdmin(admin.ModelAdmin):
 class MercadoPagoPaymentAdmin(admin.ModelAdmin):
     list_filter = ("date_created", "status")
     list_display = ("payment_id", "total_amount", "status", "date_created")
-    search_fields = ("merchand_order", "payment_id")
+    search_fields = ("merchant_order", "payment_id")
 
 class ItemsPayedAdmin(admin.ModelAdmin):
     list_filter = ("title", )

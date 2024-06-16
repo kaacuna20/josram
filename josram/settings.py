@@ -36,7 +36,7 @@ ALLOWED_HOSTS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    f'https://{os.getenv('HTTPS_PROXY')}',  # Replace with your actual Ngrok URL
+    f"https://{os.getenv('HTTPS_PROXY')}",  # Replace with your actual Ngrok URL
     # Add other trusted origins if needed
 ]
 

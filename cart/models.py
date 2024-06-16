@@ -36,7 +36,7 @@ class DirectPayments(models.Model):
         return f"Order#: {self.order}"
     
 class MercadoPagoPayment(models.Model):
-    merchand_order = models.IntegerField()
+    merchant_order = models.IntegerField()
     payment_id = models.IntegerField()
     paid_amount = models.IntegerField()
     shipping_cost = models.IntegerField()
@@ -51,7 +51,7 @@ class MercadoPagoPayment(models.Model):
     payer_lastname = models.CharField(max_length=100)
     payer_phone = models.CharField(max_length=10)
     payer_address = models.CharField(max_length=100)
-    iva = models.IntegerField(default=0)
+    iva = models.FloatField(default=0)
 
     def __str__(self):
         return f"payment: {self.payment_id}"

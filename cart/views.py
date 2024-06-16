@@ -401,7 +401,7 @@ def notificate(request):
         return HttpResponse("Merchant order not found", status=200)
     
     mercadopago_payment = MercadoPagoPayment.objects.create(
-            merchand_order=merchant_order['id'],
+            merchant_order=merchant_order['id'],
             payment_id=merchant_order['payments'][0]['id'],
             paid_amount=merchant_order["total_amount"],
             shipping_cost=merchant_order["shipping_cost"],
