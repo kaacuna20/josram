@@ -140,7 +140,8 @@ josram/
 │       ├── shipments.html
 │       └── terms-and-conditions.html
 │
-├── venv/   
+├── venv/
+├── uploads/      
 ├── manage.py  
 ├── requirements.txt
 └── .env
