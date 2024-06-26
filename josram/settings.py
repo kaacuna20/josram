@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+import dj_database_url
 
 load_dotenv(".env")
 
@@ -101,6 +102,8 @@ DATABASES = {
     }
 }
 
+DATABASES["default"] = dj_database_url.parse(os.getenv('DB_URL'))
+
 # Emails
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -142,6 +145,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATIC_URL = 'static/'
 

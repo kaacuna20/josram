@@ -19,10 +19,14 @@ from dotenv import load_dotenv
 load_dotenv(".env")
 # SDK de Mercado Pago
 import mercadopago
+from memory_profiler import profile, memory_usage
+
+log_file = open('memory.log', 'w+')
 
 
 class CartView(View):
     
+    @profile(stream=log_file)
     def get(self, request):
         stored_clothes = request.session.get("cart_clothes")
         is_enough = True
@@ -67,6 +71,7 @@ class CartView(View):
 
         return render(request, "cart/my-cart.html", context)
 
+    @profile(stream=log_file)
     def post(self, request):
         stored_clothes = request.session.get("cart_clothes")
         if stored_clothes is None:
@@ -119,6 +124,7 @@ class CartView(View):
         
 class CheckOutView(View):
 
+    @profile(stream=log_file)
     def get(self, request):
 
         stored_clothes = request.session.get("cart_clothes")
@@ -167,7 +173,7 @@ class CheckOutView(View):
            
         return render(request, "cart/checkout.html", context)
     
-
+    @profile(stream=log_file)
     def post(self, request):
 
         stored_clothes = request.session.get("cart_clothes")
@@ -192,6 +198,7 @@ class CheckOutView(View):
         return HttpResponseRedirect("/cart/checkout")
     
 class DirectPayment(View):
+    @profile(stream=log_file)
     @csrf_exempt
     def post(self, request, id_order):
         
@@ -263,6 +270,7 @@ class DirectPayment(View):
 
 
 class ReferenceView(View):
+    @profile(stream=log_file)
     @csrf_exempt
     def post(self, request):
         # Get the id that are in the cart
@@ -347,15 +355,19 @@ class ReferenceView(View):
     
         return HttpResponseRedirect(f"{preference['init_point']}")
 
+
 def success(request):
     return render(request, "cart/success.html")
+
 
 def failure(request):
     return render(request, "cart/failure.html")
 
+
 def supend(request):
     return render(request, "cart/pending.html")
 
+@profile(stream=log_file)
 @csrf_exempt
 @require_POST
 def notificate(request):

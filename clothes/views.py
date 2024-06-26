@@ -9,7 +9,9 @@ from .forms import ClotheForm, CommentForm, PriceForm
 from django.urls import reverse
 from django.core.paginator import Paginator
 from django.db.models import Q
-from blog.models import Post
+from memory_profiler import profile, memory_usage
+
+log_file = open('memory.log', 'w+')
 
 
 # Create your views here.
@@ -28,6 +30,7 @@ class FollowInstagram(ListView):
 class StartPageView(TemplateView):
     template_name = "clothes/index.html"
 
+    @profile(stream=log_file)
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -51,13 +54,13 @@ class StartPageView(TemplateView):
     
     
 class AllProducts(View):
-  
+    
+    @profile(stream=log_file)
     def get(self, request):
 
         filter_session = request.session.get("filters_colors")
         price_session = request.session.get("filters_price")
         items_order = request.session.get("order_by")
-        print(items_order)
         
         if items_order == None:
             items_order = "clothes__name"
@@ -113,7 +116,8 @@ class AllProducts(View):
             'page_obj': page_obj
         }
         return render(request, "clothes/all-products.html", context)
-   
+    
+    @profile(stream=log_file)
     def post(self, request):
         filter_session = request.session.get("filters_colors")
         price_session = request.session.get("filters_price")
@@ -166,6 +170,7 @@ class AllProducts(View):
     
 class ClothesByType(View):
     
+    @profile(stream=log_file)
     def get(self, request, slug_type):
 
         filter_session = request.session.get("filters_colors")
@@ -224,6 +229,7 @@ class ClothesByType(View):
         }
         return render(request, "clothes/type-clothes.html", context)
     
+    @profile(stream=log_file)
     def post(self, request, slug_type):
         filter_session = request.session.get("filters_colors")
         price_session = request.session.get("filters_price")
@@ -273,7 +279,8 @@ class ClothesByType(View):
 
 
 class ClothesByGender(View):
-  
+    
+    @profile(stream=log_file)
     def get(self, request, gender):
 
         filter_session = request.session.get("filters_colors")
@@ -332,6 +339,7 @@ class ClothesByGender(View):
         }
         return render(request, "clothes/gender-clothes.html", context)
     
+    @profile(stream=log_file)
     def post(self, request, gender):
         filter_session = request.session.get("filters_colors")
         price_session = request.session.get("filters_price")
@@ -380,7 +388,8 @@ class ClothesByGender(View):
     
 
 class SearhView(View):
-   
+    
+    @profile(stream=log_file)
     def get(self, request):
 
         query = request.GET.get('q')
@@ -422,7 +431,7 @@ class SearhView(View):
         return render(request, "clothes/search_results.html", context)
 
 
-
+@profile(stream=log_file)
 def clothe_details(request, slug):
     # name of clothe
     clothe_select = Clothes.objects.get(slug=slug)
