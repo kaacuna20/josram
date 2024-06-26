@@ -38,10 +38,10 @@ class Clothes(models.Model):
 
 class ImageClothes(models.Model):
      color = models.CharField(max_length=20, default=None)
-     main_image = models.ImageField(upload_to="clothes")
-     model_image_1 = models.ImageField(upload_to="clothes", null=True)
-     model_image_2 = models.ImageField(upload_to="clothes", null=True)
-     other_image = models.ImageField(upload_to="clothes", null=True)
+     main_image = models.ImageField(upload_to="clothes/")
+     model_image_1 = models.ImageField(upload_to="clothes/", null=True)
+     model_image_2 = models.ImageField(upload_to="clothes/", null=True)
+     other_image = models.ImageField(upload_to="clothes/", null=True)
      in_instagram = models.BooleanField(default=False)
      url_instagram = models.URLField(unique=True, null=True)
      clothes = models.ForeignKey(Clothes, related_name="Colors", on_delete=models.CASCADE, null=True)
