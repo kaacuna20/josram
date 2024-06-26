@@ -16,14 +16,7 @@ import os
 import dj_database_url
 import locale
 
-try:
-    locale.setlocale(locale.LC_ALL, 'es_CO.UTF-8')
-except locale.Error:
-    try:
-        locale.setlocale(locale.LC_ALL, 'es_CO')
-    except locale.Error:
-        print("Failed to set locale. Defaulting to 'C' locale.")
-        locale.setlocale(locale.LC_ALL, 'C')
+locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
 
 load_dotenv(".env")
