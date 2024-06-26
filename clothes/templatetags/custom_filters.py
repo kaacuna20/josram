@@ -7,7 +7,7 @@ register = template.Library()
 def currency(value):
     try:
         # Set locale to US for formatting (or your desired locale)
-        locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+        locale.setlocale(locale.LC_ALL, '')
         # Format with thousands separator and currency symbol
         return locale.currency(value, grouping=True)
     except (ValueError, TypeError):
