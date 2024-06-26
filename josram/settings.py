@@ -162,7 +162,8 @@ STATICFILES_DIRS = [
 ]
 
 
-MEDIA_ROOT = MEDIA_ROOT = os.path.join('/tmp', 'uploads')
+
+MEDIA_ROOT = BASE_DIR / "uploads"
 MEDIA_URL = "/josran-media/"
 
 # Default primary key field type
