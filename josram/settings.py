@@ -33,7 +33,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    os.getenv('HTTPS_PROXY')
+    os.getenv('HOST')
 ]
 
 #CSRF_TRUSTED_ORIGINS = [
