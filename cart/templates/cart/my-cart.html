@@ -109,7 +109,7 @@ Tu carrito - JOSRAM
                 {% load custom_filters %}
                 SUBTOTAL: <span id="total_general">{{ sum_prices|currency }}</span>
             </h2>
-            <form action="{% url "cheackout-buy" %}" method="POST">
+            <form action="{% url 'checkout-buy' %}" method="POST">
                 {% csrf_token %}
                 {% if not is_enough %}
                 <div class="py-2">

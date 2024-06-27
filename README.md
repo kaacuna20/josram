@@ -141,7 +141,10 @@ josram/
 │       └── terms-and-conditions.html
 │
 ├── venv/
+├── staticfiles/
 ├── uploads/      
+│       ├── clothes/
+│       └── post/
 ├── manage.py  
 ├── requirements.txt
 └── .env
@@ -160,7 +163,7 @@ TWILIO_ACCOUNT_SID=JOSRAM_TWILIO_ACCOUNT_SID
 TWILIO_AUTH_TOKEN=JOSRAM_TWILIO_AUTH_TOKEN
 JOSRAM_NUMBER=JOSRAM_NUMBER_PHONE
 MERCADOPAGO_ACCESS_TOKEN=YOUR_ACCESS_TOKEN
-HTTPS_PROXY=NGROK_HTTPS_URL
+HOST=NGROK_HTTPS_URL OR HOST_HTTPS
 ```
 
 ## Directory and File Descriptions
@@ -218,6 +221,8 @@ HTTPS_PROXY=NGROK_HTTPS_URL
   - Includes templates for different policies like privacy, terms, and conditions.
 
 - `venv/`: Virtual environment directory for managing project dependencies.
+
+- `uploads/`: Folder where store images at moment save images from models.
 
 - `manage.py`: Command-line utility for managing the Django project.
 

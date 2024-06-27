@@ -25,7 +25,6 @@ log_file = open('memory.log', 'w+')
 
 
 class CartView(View):
-    
     @profile(stream=log_file)
     def get(self, request):
         stored_clothes = request.session.get("cart_clothes")
@@ -90,6 +89,7 @@ class CartView(View):
                 stored_clothes.append(clothe_choosed)
                 request.session["cart_clothes"] = stored_clothes
                 name = SizeClothes.objects.get(pk=sizes_clothes_id).color_clothe.clothes.name
+                
             elif sizes_clothes_id in stored_id:
                 slug_clothe = SizeClothes.objects.get(pk=sizes_clothes_id)
                 name = SizeClothes.objects.get(pk=sizes_clothes_id).color_clothe.clothes.name
@@ -123,7 +123,6 @@ class CartView(View):
         
         
 class CheckOutView(View):
-
     @profile(stream=log_file)
     def get(self, request):
 

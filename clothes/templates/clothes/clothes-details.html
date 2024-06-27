@@ -319,6 +319,7 @@
                         {% endfor %}
                     </script>
                     {% endif %}
+                </form>
                 
                     <div id="stock-info">
                         {% if not is_enough or not size_clothes.in_stock %}
@@ -329,14 +330,7 @@
                             <button type="button" class="btn btn-dark rounded-pill w-100 disabled">Agregar al carrito</button>
                         </div>
                         {% else %}
-                        <form action="cheackout-buy" method="POST">
-                            {% csrf_token %}
-                            <div class="py-2 text-center">
-                                <input type="hidden" value="{{ form.cant.value }}" name="sizes_clothes_cant">
-                                <input type="hidden" value="{{ size_clothes.pk }}" name="sizes_clothes_pk">
-                                <button type="submit" class="btn btn-outline-dark rounded-pill mt-2 w-100">Ir a comprar</button>
-                            </div>
-                        </form>
+                       
                         <form action="{% url 'your-cart' %}" method="POST">
                             {% csrf_token %}
                             <div class="py-2 text-center">
@@ -345,9 +339,18 @@
                                 <button type="submit" class="btn btn-dark rounded-pill w-100">Agregar al carrito</button>
                             </div>
                         </form>
+
+                        <form action="{% url 'checkout-buy' %}" method="POST">
+                            {% csrf_token %}
+                            <div class="py-2 text-center">
+                                <input type="hidden" value="{{ form.cant.value }}" name="sizes_clothes_cant">
+                                <input type="hidden" value="{{ size_clothes.pk }}" name="sizes_clothes_pk">
+                                <button type="submit" class="btn btn-outline-dark rounded-pill mt-2 w-100">Ir a comprar</button>
+                            </div>
+                        </form>
                         {% endif %}
                     </div>
-                </form>
+                
 
                 <div class="py-2">
                     <p class="text-justify" style="font-family: 'Lato', sans-serif;">
