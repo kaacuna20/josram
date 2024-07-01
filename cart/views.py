@@ -37,6 +37,7 @@ class CartView(View):
         if stored_clothes is None or len(stored_clothes) == 0:
             context["carts"] = []
             context["has_clothes"] = False
+            
         else:
             cart = []
             for clothe in stored_clothes:
@@ -130,6 +131,7 @@ class CheckOutView(View):
         context = {}
         len_cart = len(request.session.get("cart_clothes"))
         cost_shipments = request.GET.get("cost_shipments")
+        is_enough = True
         
         if cost_shipments is None:
             cost_shipments = 8000
@@ -145,8 +147,12 @@ class CheckOutView(View):
         else:
             cart = []
             for clothe in stored_clothes:
+                is_stock_enough = True
                 quantity = clothe["cant"]
                 clothe_stored = SizeClothes.objects.get(pk=clothe["id"])
+                if clothe_stored.cant < quantity or not clothe_stored.in_stock:
+                    is_enough = False
+                    is_stock_enough = False
                 total_price = quantity * clothe_stored.color_clothe.clothes.price
                 cart.append({
                     "size_pk": clothe_stored.pk,
@@ -158,7 +164,7 @@ class CheckOutView(View):
                     "price": clothe_stored.color_clothe.clothes.price,
                     "quantity": quantity,
                     "total_price": total_price,
-                    
+                    "is_stock_enough": is_stock_enough
                 })
 
             sum_prices = sum([item["total_price"] for item in cart]) 
@@ -169,6 +175,7 @@ class CheckOutView(View):
             context["sum_prices"] = sum_prices
             context["cost_shipments"] = cost_shipments
             context["order_josram"] = secrets.randbelow(10**12)
+            context["is_enough"] = is_enough
            
         return render(request, "cart/checkout.html", context)
     

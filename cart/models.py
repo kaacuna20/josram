@@ -5,6 +5,12 @@ from django.utils import timezone
 # Create your models here.
 
 
+STATUS_CHOICES =(
+    ("aproved", "aproved"),
+    ("rejected", "rejected"),
+    ("pending", "pending"),
+)
+
 class DirectPayments(models.Model):
     order = models.IntegerField()
     payer_fullname = models.CharField(max_length=100)
@@ -15,7 +21,7 @@ class DirectPayments(models.Model):
     paid_amount = models.IntegerField()
     total_amount = models.IntegerField()
     date_order_created = models.DateTimeField(auto_now_add=True)  
-    status = models.CharField(max_length=10, default="pending")
+    status = models.CharField(choices=STATUS_CHOICES, default="pending")
     is_payed = models.BooleanField(default=False)
    
     def save(self, *args, **kwargs):

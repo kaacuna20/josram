@@ -111,16 +111,29 @@ sección de pago
             </div>
             <div class="ms-3">
               <h6 class="my-0">{{ clothe.name }}</h6>
+            
               <small class="text-body-secondary">Talla {{ clothe.size }}</small>
               <div>
                 <small class="text-body-secondary">{{ clothe.quantity }} Uds.</small>
               </div>
+                  {% if not clothe.is_stock_enough %}
+              <div class="ms-0 px-0">
+                <small style="font-style: italic;">
+                      <svg style="color:red;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-circle" viewBox="0 0 16 16">
+                          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                          <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+                      </svg>
+                  Stock sobrepasado!</small>
+              </div>
+            {% endif %}
             </div>
-            <div>
+            <div class="ms-0 px-0">
               {% load custom_filters %}
               <span class="text-body-secondary">{{ clothe.total_price|currency }}</span>
             </div>
+            
           </li>
+          
           {% endfor %}
           <li class="list-group-item d-flex justify-content-between bg-body-tertiary">
             <div class="text-success">
@@ -304,7 +317,12 @@ sección de pago
     </div>
   </div>
 </div>
-          <button id="checkout-button" class="w-100 btn btn-primary btn-lg mt-5" type="submit" style="background-color:black;">Ir a pagar</button>
+    {% if not is_enough %}
+          <button id="checkout-button" class="w-100 btn btn-primary btn-lg mt-5 disabled" type="submit" style="background-color:black;">Ir a pagar</button>
+        {% else %}
+        <button id="checkout-button" class="w-100 btn btn-primary btn-lg mt-5" type="submit" style="background-color:black;">Ir a pagar</button>
+
+        {% endif %}
         </form>
       </div>
     </div>
