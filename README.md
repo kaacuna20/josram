@@ -20,7 +20,7 @@
 
 This project I choosed Django because the schema and panel admin is going to be useful to comply with the client requirements.
 
-You can test and enjoy a demo aplication in next link: http://ec2-18-116-26-246.us-east-2.compute.amazonaws.com/
+You can test and enjoy a demo aplication in next link: https://josram.onrender.com/
 
 ## Table of Contents
 - [Project Structure](#Project-Structure)
