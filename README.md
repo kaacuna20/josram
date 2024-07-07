@@ -6,8 +6,6 @@
 
 <h4 align="justify">This is a project developed by a client who need an interactive website to sell sport clothes by both gender, with the consent of the client, I share the project to public.</h4> 
 
-You can test and enjoy a demo aplication in next link: http://ec2-18-116-26-246.us-east-2.compute.amazonaws.com/
-
 ### Features of aplication
 
 - Website must have a navbar with overview of services offer JOSRAM, divide them in categories;
@@ -21,6 +19,8 @@ You can test and enjoy a demo aplication in next link: http://ec2-18-116-26-246.
 ### Choose the tool
 
 This project I choosed Django because the schema and panel admin is going to be useful to comply with the client requirements.
+
+You can test and enjoy a demo aplication in next link: http://ec2-18-116-26-246.us-east-2.compute.amazonaws.com/
 
 ## Table of Contents
 - [Project Structure](#Project-Structure)
