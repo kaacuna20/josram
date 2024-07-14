@@ -7,25 +7,22 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from datetime import datetime, timedelta
 from django.http import JsonResponse, HttpResponse
-from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from cart.models import ItemsPayed, DirectPayments, MercadoPagoPayment
-from cart.sms_utils import send_sms
-from cart.email_utils import send_email
+from cart.notification_service import *
+from django.views.generic import TemplateView
 import secrets
 import os
+import threading
 from dotenv import load_dotenv
-
-load_dotenv(".env")
 # SDK de Mercado Pago
 import mercadopago
-from memory_profiler import profile, memory_usage
 
-log_file = open('memory.log', 'w+')
+load_dotenv(".env")
 
 
 class CartView(View):
-    @profile(stream=log_file)
+
     def get(self, request):
         stored_clothes = request.session.get("cart_clothes")
         is_enough = True
@@ -71,7 +68,6 @@ class CartView(View):
 
         return render(request, "cart/my-cart.html", context)
 
-    @profile(stream=log_file)
     def post(self, request):
         stored_clothes = request.session.get("cart_clothes")
         if stored_clothes is None:
@@ -124,7 +120,7 @@ class CartView(View):
         
         
 class CheckOutView(View):
-    @profile(stream=log_file)
+
     def get(self, request):
 
         stored_clothes = request.session.get("cart_clothes")
@@ -179,7 +175,6 @@ class CheckOutView(View):
            
         return render(request, "cart/checkout.html", context)
     
-    @profile(stream=log_file)
     def post(self, request):
 
         stored_clothes = request.session.get("cart_clothes")
@@ -203,8 +198,16 @@ class CheckOutView(View):
         
         return HttpResponseRedirect("/cart/checkout")
     
+    
+threading_sms = threading.Thread(target=sms_queue, daemon=True)
+threading_email = threading.Thread(target=email_queue, daemon=True)
+
+
+threading_sms.start()
+threading_email.start()
+    
 class DirectPayment(View):
-    @profile(stream=log_file)
+
     @csrf_exempt
     def post(self, request, id_order):
         
@@ -262,7 +265,7 @@ class DirectPayment(View):
             )
         merchand_order_josram = id_order
         message_sms = f"Pago directo - orden#{id_order}: {payer_data['name']} {payer_data['lastname']} realizó un pedido con total de ${sum_prices}."
-        send_sms(message=message_sms)
+        sms.message_queue.put(message_sms)
         context = {
             "carts": cart,
             "payer": payer_data,
@@ -270,13 +273,13 @@ class DirectPayment(View):
             "sum_prices": sum_prices,
             "cost_shipments": cost_shipments
         }
-        send_email(subject=f"Orden de compra #{id_order}", template="cart/direct-payment-form.html", destination=payer_data["email"], context=context)
+        email.message_queue.put((f"Orden de compra #{id_order}", "cart/direct-payment-form.html", payer_data["email"], context))
 
         return render(request, "cart/direct-payment-form.html", context)
 
 
 class ReferenceView(View):
-    @profile(stream=log_file)
+
     @csrf_exempt
     def post(self, request):
         # Get the id that are in the cart
@@ -298,7 +301,7 @@ class ReferenceView(View):
         expiration_date_to = expiration_date_from + timedelta(days=3)
       
         sdk = mercadopago.SDK(os.getenv('MERCADOPAGO_ACCESS_TOKEN'))
-        # Crea un ítem en la preferencia
+        # Create a item with preference
         preference_data = {
             "auto_return": "approved",
 
@@ -362,113 +365,116 @@ class ReferenceView(View):
         return HttpResponseRedirect(f"{preference['init_point']}")
 
 
-def success(request):
-    return render(request, "cart/success.html")
-
-
-def failure(request):
-    return render(request, "cart/failure.html")
-
-
-def supend(request):
-    return render(request, "cart/pending.html")
-
-@profile(stream=log_file)
-@csrf_exempt
-@require_POST
-def notificate(request):
-    sdk = mercadopago.SDK(os.getenv('MERCADOPAGO_ACCESS_TOKEN'))
+class SuccessView(TemplateView):
+    template_name = "cart/success.html"
     
-    # Extract query parameters
-    topic = request.GET.get("type")
-    data_id = request.GET.get("data.id")
-
-    if not topic or not data_id:
-        print("Invalid request")
-        return HttpResponse("Invalid request", status=200)
-
-    merchant_order = None
-
-    if topic == "payment":
-        payment_response = sdk.payment().get(data_id)
-        if payment_response["status"] != 200:
-            print("Payment not found")
-            return HttpResponse("Payment not found", status=200)
+    
+class FailureView(TemplateView):
+    template_name = "cart/failure.html"
+   
+    
+class SuspendView(TemplateView):
+    template_name = "cart/pending.html"   
+    
+    
+class NotificationView(View):
+    
+    @csrf_exempt
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+    
+    def post(self, request):
+        sdk = mercadopago.SDK(os.getenv('MERCADOPAGO_ACCESS_TOKEN'))
         
-        payment = payment_response["response"]
-        order_id = payment["order"]["id"]
-        merchant_order_response = sdk.merchant_order().get(order_id)
+        # Extract query parameters
+        topic = request.GET.get("type")
+        data_id = request.GET.get("data.id")
+
+        if not topic or not data_id:
+            print("Invalid request")
+            return HttpResponse("Invalid request", status=200)
+
+        merchant_order = None
+
+        if topic == "payment":
+            payment_response = sdk.payment().get(data_id)
+            if payment_response["status"] != 200:
+                print("Payment not found")
+                return HttpResponse("Payment not found", status=200)
+            
+            payment = payment_response["response"]
+            order_id = payment["order"]["id"]
+            merchant_order_response = sdk.merchant_order().get(order_id)
+            
+            if merchant_order_response["status"] != 200:
+                print("Merchant order not found")
+                return HttpResponse("Merchant order not found", status=200)
+            
+            merchant_order = merchant_order_response["response"]
         
-        if merchant_order_response["status"] != 200:
+        elif topic == "merchant_order":
+            merchant_order_response = sdk.merchant_order().get(data_id)
+            
+            if merchant_order_response["status"] != 200:
+                print("Merchant order not found")
+                return HttpResponse("Merchant order not found", status=200)
+            
+            merchant_order = merchant_order_response["response"]
+        
+        if not merchant_order:
             print("Merchant order not found")
             return HttpResponse("Merchant order not found", status=200)
         
-        merchant_order = merchant_order_response["response"]
-    
-    elif topic == "merchant_order":
-        merchant_order_response = sdk.merchant_order().get(data_id)
-        
-        if merchant_order_response["status"] != 200:
-            print("Merchant order not found")
-            return HttpResponse("Merchant order not found", status=200)
-        
-        merchant_order = merchant_order_response["response"]
-       
-    if not merchant_order:
-        print("Merchant order not found")
-        return HttpResponse("Merchant order not found", status=200)
-    
-    mercadopago_payment = MercadoPagoPayment.objects.create(
-            merchant_order=merchant_order['id'],
-            payment_id=merchant_order['payments'][0]['id'],
-            paid_amount=merchant_order["total_amount"],
-            shipping_cost=merchant_order["shipping_cost"],
-            total_amount=merchant_order['payments'][0]['total_paid_amount'],
-            net_received_amount=payment["transaction_details"]["net_received_amount"],
-            status=merchant_order['payments'][0]['status'],
-            date_created=merchant_order["date_created"].split("T")[0], #2024-05-23T16:45:53.000-04:00
-            order_status=merchant_order["order_status"],
-            payment_method_id=payment["payment_method_id"],
-            payment_type_id=payment["payment_type_id"],
-            payer_name=payment["additional_info"]["payer"]["first_name"],
-            payer_lastname=payment["additional_info"]["payer"]["last_name"],
-            payer_phone=payment["additional_info"]["payer"]["phone"]["number"],
-            payer_address=payment["additional_info"]["payer"]["address"]["street_name"],
-            iva=payment["taxes"][0]["value"]
-        )
-
-        # Adding datas in the ItemsPayed and relate with MercadoPagoPayment
-    for item in merchant_order["items"]:
-            ItemsPayed.objects.create(
-                item_id=item["id"],
-                title=item["title"],
-                description=item["description"],
-                quantity=item["quantity"],
-                unit_price=item["unit_price"],
-                mercadopago_payment=mercadopago_payment  # Pass the MercadoPagotPayment instance
+        mercadopago_payment = MercadoPagoPayment.objects.create(
+                merchant_order=merchant_order['id'],
+                payment_id=merchant_order['payments'][0]['id'],
+                paid_amount=merchant_order["total_amount"],
+                shipping_cost=merchant_order["shipping_cost"],
+                total_amount=merchant_order['payments'][0]['total_paid_amount'],
+                net_received_amount=payment["transaction_details"]["net_received_amount"],
+                status=merchant_order['payments'][0]['status'],
+                date_created=merchant_order["date_created"].split("T")[0], #2024-05-23T16:45:53.000-04:00
+                order_status=merchant_order["order_status"],
+                payment_method_id=payment["payment_method_id"],
+                payment_type_id=payment["payment_type_id"],
+                payer_name=payment["additional_info"]["payer"]["first_name"],
+                payer_lastname=payment["additional_info"]["payer"]["last_name"],
+                payer_phone=payment["additional_info"]["payer"]["phone"]["number"],
+                payer_address=payment["additional_info"]["payer"]["address"]["street_name"],
+                iva=payment["taxes"][0]["value"]
             )
 
-    
-    # Calculate paid amount
-    paid_amount = sum(payment['transaction_amount'] for payment in merchant_order["payments"] if payment['status'] == 'approved')
+            # Adding datas in the ItemsPayed and relate with MercadoPagoPayment
+        for item in merchant_order["items"]:
+                ItemsPayed.objects.create(
+                    item_id=item["id"],
+                    title=item["title"],
+                    description=item["description"],
+                    quantity=item["quantity"],
+                    unit_price=item["unit_price"],
+                    mercadopago_payment=mercadopago_payment  # Pass the MercadoPagotPayment instance
+                )
 
-    # Check if the total paid amount covers the order amount
-    if paid_amount >= merchant_order["total_amount"]:
-        # Adding datas in the MercadoPagoPayment
-        message_sms = f"Pago mercadopago - orden#{merchant_order['payments'][0]['id']}: "\
-                  f"{payment['additional_info']['payer']['first_name']} {payment['additional_info']['payer']['last_name']} "\
-                  f"realizó una compra con total de ${merchant_order['payments'][0]['total_paid_amount']}, su estatus fue {merchant_order['payments'][0]['status']}"
-        send_sms(message=message_sms)
-        
-        if merchant_order.get("shipments") and merchant_order["shipments"][0]["status"] == "ready_to_ship":
-            print("Totally paid. Print the label and release your item.")
-            return HttpResponse("Totally paid. Print the label and release your item.", status=200)
-        
+        # Calculate paid amount
+        paid_amount = sum(payment['transaction_amount'] for payment in merchant_order["payments"] if payment['status'] == 'approved')
+
+        # Check if the total paid amount covers the order amount
+        if paid_amount >= merchant_order["total_amount"]:
+            # Adding datas in the MercadoPagoPayment
+            message_sms = f"Pago mercadopago - orden#{merchant_order['payments'][0]['id']}: "\
+                    f"{payment['additional_info']['payer']['first_name']} {payment['additional_info']['payer']['last_name']} "\
+                    f"realizó una compra con total de ${merchant_order['payments'][0]['total_paid_amount']}, su estatus fue {merchant_order['payments'][0]['status']}"
+            sms.message_queue.put(message_sms)
+            
+            if merchant_order.get("shipments") and merchant_order["shipments"][0]["status"] == "ready_to_ship":
+                print("Totally paid. Print the label and release your item.")
+                return HttpResponse("Totally paid. Print the label and release your item.", status=200)
+            
+            else:
+                print("Totally paid. Release your item.")
+                return HttpResponse("Totally paid. Release your item.", status=200)
         else:
-            print("Totally paid. Release your item.")
-            return HttpResponse("Totally paid. Release your item.", status=200)
-    else:
-        print("Not paid yet. Do not release your item.")
-        return HttpResponse("Not paid yet. Do not release your item.", status=200)
+            print("Not paid yet. Do not release your item.")
+            return HttpResponse("Not paid yet. Do not release your item.", status=200)
     
 

@@ -1,24 +1,19 @@
 from typing import Any
 from django.db.models.query import QuerySet
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.http import HttpResponseRedirect
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView
 from .models import Clothes, ImageClothes, SizeClothes
 from .forms import ClotheForm, CommentForm, PriceForm
 from django.urls import reverse
 from django.core.paginator import Paginator
 from django.db.models import Q
-from memory_profiler import profile, memory_usage
-
-log_file = open('memory.log', 'w+')
-
+from django.views.generic import ListView, TemplateView
+from .models import ImageClothes
 
 # Create your views here.
 
-
-from django.views.generic import ListView, TemplateView
-from .models import ImageClothes
 
 class FollowInstagram(ListView):
     template_name = "clothes/follow.html"
@@ -30,7 +25,6 @@ class FollowInstagram(ListView):
 class StartPageView(TemplateView):
     template_name = "clothes/index.html"
 
-    @profile(stream=log_file)
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -52,10 +46,8 @@ class StartPageView(TemplateView):
         return context
 
     
-    
 class AllProducts(View):
     
-    @profile(stream=log_file)
     def get(self, request):
 
         filter_session = request.session.get("filters_colors")
@@ -65,7 +57,6 @@ class AllProducts(View):
         if items_order == None:
             items_order = "clothes__name"
         
-
        # Base QuerySet
         all_products = ImageClothes.objects.all()
 
@@ -117,7 +108,6 @@ class AllProducts(View):
         }
         return render(request, "clothes/all-products.html", context)
     
-    @profile(stream=log_file)
     def post(self, request):
         filter_session = request.session.get("filters_colors")
         price_session = request.session.get("filters_price")
@@ -164,13 +154,11 @@ class AllProducts(View):
             items_order = request.POST["item_order"]
             request.session["order_by"] = items_order
                 
-            
         return HttpResponseRedirect("/products/all")
-################################################################
+
     
 class ClothesByType(View):
     
-    @profile(stream=log_file)
     def get(self, request, slug_type):
 
         filter_session = request.session.get("filters_colors")
@@ -229,7 +217,6 @@ class ClothesByType(View):
         }
         return render(request, "clothes/type-clothes.html", context)
     
-    @profile(stream=log_file)
     def post(self, request, slug_type):
         filter_session = request.session.get("filters_colors")
         price_session = request.session.get("filters_price")
@@ -277,10 +264,8 @@ class ClothesByType(View):
         return HttpResponseRedirect("/collections/" + slug_type)
 
 
-
 class ClothesByGender(View):
     
-    @profile(stream=log_file)
     def get(self, request, gender):
 
         filter_session = request.session.get("filters_colors")
@@ -339,7 +324,6 @@ class ClothesByGender(View):
         }
         return render(request, "clothes/gender-clothes.html", context)
     
-    @profile(stream=log_file)
     def post(self, request, gender):
         filter_session = request.session.get("filters_colors")
         price_session = request.session.get("filters_price")
@@ -389,7 +373,6 @@ class ClothesByGender(View):
 
 class SearhView(View):
     
-    @profile(stream=log_file)
     def get(self, request):
 
         query = request.GET.get('q')
@@ -431,7 +414,101 @@ class SearhView(View):
         return render(request, "clothes/search_results.html", context)
 
 
-@profile(stream=log_file)
+class ClotheDetailView(View):
+    template_name = "clothes/clothes-details.html"
+
+    def get(self, request, slug):
+        clothe_select = get_object_or_404(Clothes, slug=slug)
+        color_clothes = ImageClothes.objects.filter(clothes__slug=slug)
+        size_clothes_form = SizeClothes.objects.filter(color_clothe__clothes__slug=slug)
+        comment_form = CommentForm()
+        form = ClotheForm(size_clothes_form)
+        added_cart = True
+        default_size = form.fields["size"].initial
+        default_color = form.fields["color"].initial
+        sizes_clothes = SizeClothes.objects.get(color_clothe__clothes__slug=slug, color_clothe__color=default_color, size=default_size)
+        is_enough = True
+
+        follow_instagram_view = FollowInstagram()
+        instagram_clothes = follow_instagram_view.get_queryset()
+
+        len_cart = 0
+        if request.session.get("cart_clothes") is not None:
+            len_cart = len(request.session.get("cart_clothes"))
+
+        if int(form.fields["cant"].initial) > sizes_clothes.cant:
+            is_enough = False
+
+        context = {
+            "color_clothes": color_clothes,
+            "clothe_details": clothe_select,
+            "form": form,
+            "is_enough": is_enough,
+            "comment_form": comment_form,
+            "comments": clothe_select.comments.all().order_by("-date"),
+            "size_clothes": sizes_clothes,
+            "number": len_cart,
+            "added_cart": added_cart,
+            "instagram_clothes": instagram_clothes,
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, slug):
+        clothe_select = get_object_or_404(Clothes, slug=slug)
+        color_clothes = ImageClothes.objects.filter(clothes__slug=slug)
+        size_clothes_form = SizeClothes.objects.filter(color_clothe__clothes__slug=slug)
+        comment_form = CommentForm()
+        form = ClotheForm(size_clothes_form)
+        added_cart = True
+        default_size = form.fields["size"].initial
+        default_color = form.fields["color"].initial
+        sizes_clothes = SizeClothes.objects.get(color_clothe__clothes__slug=slug, color_clothe__color=default_color, size=default_size)
+        is_enough = True
+
+        follow_instagram_view = FollowInstagram()
+        instagram_clothes = follow_instagram_view.get_queryset()
+
+        len_cart = 0
+        if request.session.get("cart_clothes") is not None:
+            len_cart = len(request.session.get("cart_clothes"))
+
+        scroll_pos = request.POST.get("scrollPos", "0")
+        form = ClotheForm(size_clothes_form, request.POST)
+        if form.is_valid():
+            post_color = request.POST["color"]
+            post_size = request.POST["size"]
+            post_cant = int(request.POST["cant"])
+            if "verify" in request.POST or "size" in request.POST or "color" in request.POST:
+                try:
+                    sizes_clothes = SizeClothes.objects.get(size=post_size, color_clothe__clothes__slug=slug, color_clothe__color=post_color)
+                    if post_cant > sizes_clothes.cant:
+                        is_enough = False
+                except SizeClothes.DoesNotExist:
+                    sizes_clothes = None
+                    is_enough = False
+        elif "comment" in request.POST:
+            comment_form = CommentForm(request.POST)
+            if comment_form.is_valid():
+                comment = comment_form.save(commit=False)
+                comment.clothes = clothe_select
+                comment.save()
+                return HttpResponseRedirect(f"{slug}?scrollPos={scroll_pos}")
+
+        context = {
+            "color_clothes": color_clothes,
+            "clothe_details": clothe_select,
+            "form": form,
+            "is_enough": is_enough,
+            "comment_form": comment_form,
+            "comments": clothe_select.comments.all().order_by("-date"),
+            "size_clothes": sizes_clothes,
+            "number": len_cart,
+            "added_cart": added_cart,
+            "instagram_clothes": instagram_clothes,
+        }
+        return render(request, self.template_name, context)
+        
+
 def clothe_details(request, slug):
     # name of clothe
     clothe_select = Clothes.objects.get(slug=slug)
@@ -505,7 +582,7 @@ def clothe_details(request, slug):
         }
     return render(request, "clothes/clothes-details.html", context)
     
-#context.update()
+
 
 
 

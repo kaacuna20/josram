@@ -21,7 +21,7 @@ class DirectPayments(models.Model):
     paid_amount = models.IntegerField()
     total_amount = models.IntegerField()
     date_order_created = models.DateTimeField(auto_now_add=True)  
-    status = models.CharField(choices=STATUS_CHOICES, default="pending")
+    status = models.CharField(choices=STATUS_CHOICES, default="pending", max_length=100)
     is_payed = models.BooleanField(default=False)
    
     def save(self, *args, **kwargs):

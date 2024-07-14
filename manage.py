@@ -1,11 +1,8 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-from memory_profiler import profile
 
-log_file = open('memory.log', 'w+')
 
-@profile(stream=log_file)
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'josram.settings')
@@ -21,3 +18,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    

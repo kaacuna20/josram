@@ -34,13 +34,13 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    os.getenv('HOST')
+    os.getenv('HOST'),
 ]
 
-#CSRF_TRUSTED_ORIGINS = [
-#    f"https://{os.getenv('HTTPS_PROXY')}",  # Replace with your actual Ngrok URL
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{os.getenv('HOST')}",  # Replace with your actual Ngrok URL
     # Add other trusted origins if needed
-#]
+]
 
 # Application definition
 
@@ -103,7 +103,7 @@ DATABASES = {
     }
 }
 
-DATABASES["default"] = dj_database_url.parse(os.getenv('DB_URL'))
+#DATABASES["default"] = dj_database_url.parse(os.getenv('DB_URL'))
 
 # Emails
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
