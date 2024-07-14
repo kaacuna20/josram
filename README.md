@@ -88,8 +88,7 @@ josram/
 │   ├── admin.py
 │   ├── apps.py
 |   ├── forms.py
-|   ├── sms_utils.py
-|   ├── email_utils.py
+|   ├── notification_service.py
 |   ├── middleware.py
 |   ├── models.py
 |   ├── test.py
@@ -442,21 +441,23 @@ Create views to handle success, failure, and pending payment responses in `cart/
 
 ```ini
 
-def payment_success(request):
-    return render(request, 'cart/success.html')
-
-def payment_failure(request):
-    return render(request, 'cart/failure.html')
-
-def payment_pending(request):
-    return render(request, 'cart/pending.html')
+class SuccessView(TemplateView):
+    template_name = "cart/success.html"
+    
+    
+class FailureView(TemplateView):
+    template_name = "cart/failure.html"
+   
+    
+class SuspendView(TemplateView):
+    template_name = "cart/pending.html"   
 ```
 And add corresponding URLs in `cart/urls.py`:
 
 ```ini
-    path("success", views.success),
-    path("failure", views.failure),
-    path("pending", views.supend),
+    path("success", views.SuccessView.as_view(), name="success-notification"),
+    path("failure", views.FailureView.as_view(), name="failure-notification"),
+    path("pending", views.SuspendView.as_view(), name="suspend-notification"),
 ```
 Step 9: Test Your Integration
 1. Start your Django server:
