@@ -103,7 +103,7 @@ DATABASES = {
     }
 }
 
-#DATABASES["default"] = dj_database_url.parse(os.getenv('DB_URL'))
+DATABASES["default"] = dj_database_url.parse(os.getenv('DB_URL'))
 
 # Emails
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
